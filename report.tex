@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{listings}
+\usepackage{xcolor}
 
 \addto{\captionsenglish}{\renewcommand{\bibname}{Bibliographie}}
 
@@ -48,6 +49,34 @@
       % together with the lstlisting environment. Consider typing code in
       % external files and using \lstinputlisting to display them instead.      
   }
+
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 
 \hypersetup{
   colorlinks=true,
@@ -373,10 +402,17 @@
     \subsection{Déploiement}
 
     Une fois le modèle entraîné, il est temps de le déployer sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes.
-    Dans notre cas, nous aurons besoin de définir un endpoint pour 
+    Dans notre cas, nous aurons besoin de définir les endpoints suivants :
+    \begin{itemize}
+        \item predict
+        \item train
+        \item test ?? (pas sûr)
+    \end{itemize}
 
     \subsection{Monitoring du modèle}
-    (Pas forcément de code à mettre, il faut seulement parler des métriques de performances à utiliser et des mécanismes de monitoring qui peuvent être mis en place)
+    
+    Une fois notre modèle entraîné et déployé, il est important de mettre des mécanismes en place pour s'assurer que ses prédictions restent suffisamment précises sur la durée. En effet, un problème courant lorsque l'on travaille avec des modèles de séries temporelles est le \textbf{data drift}. Le data drift désigne le phénomène qui arrive lorsque la relation entre nos valeurs prédites $Y$ et nos features $X$ change au fil du temps. Le data drift est particulièrement courant lorsque l'on travaille avec des données non stationnaires, comme dans notre cas.
+    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe en-dessous d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes.
 
     \newpage
     \begin{thebibliography}{4}
