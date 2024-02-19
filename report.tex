@@ -7,6 +7,47 @@
 \usepackage[justification=centering]{caption}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{listings}
+
+\addto{\captionsenglish}{\renewcommand{\bibname}{Bibliographie}}
+
+\lstset{
+    inputencoding = utf8,  % Input encoding
+    extendedchars = true,  % Extended ASCII
+    literate      =        % Support additional characters
+      {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
+      {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
+      {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
+      {À}{{\`A}}1  {È}{{\`E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
+      {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
+      {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
+      {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
+      {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
+      {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
+      {ẞ}{{\SS}}1  {ç}{{\c{c}}}1 {Ç}{{\c{C}}}1 {ø}{{\o}}1  {Ø}{{\O}}1
+      {å}{{\aa}}1  {Å}{{\AA}}1  {ã}{{\~a}}1  {õ}{{\~o}}1 {Ã}{{\~A}}1
+      {Õ}{{\~O}}1  {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1
+      {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+      {£}{{\pounds}}1  {©}{{\copyright}}1  {®}{{\textregistered}}1
+      {«}{{\guillemotleft}}1  {»}{{\guillemotright}}1  {Ð}{{\DH}}1  {ð}{{\dh}}1
+      {Ý}{{\'Y}}1    {ý}{{\'y}}1    {Þ}{{\TH}}1    {þ}{{\th}}1    {Ă}{{\u{A}}}1
+      {ă}{{\u{a}}}1  {Ą}{{\k{A}}}1  {ą}{{\k{a}}}1  {Ć}{{\'C}}1    {ć}{{\'c}}1
+      {Č}{{\v{C}}}1  {č}{{\v{c}}}1  {Ď}{{\v{D}}}1  {ď}{{\v{d}}}1  {Đ}{{\DJ}}1
+      {đ}{{\dj}}1    {Ė}{{\.{E}}}1  {ė}{{\.{e}}}1  {Ę}{{\k{E}}}1  {ę}{{\k{e}}}1
+      {Ě}{{\v{E}}}1  {ě}{{\v{e}}}1  {Ğ}{{\u{G}}}1  {ğ}{{\u{g}}}1  {Ĩ}{{\~I}}1
+      {ĩ}{{\~\i}}1   {Į}{{\k{I}}}1  {į}{{\k{i}}}1  {İ}{{\.{I}}}1  {ı}{{\i}}1
+      {Ĺ}{{\'L}}1    {ĺ}{{\'l}}1    {Ľ}{{\v{L}}}1  {ľ}{{\v{l}}}1  {Ł}{{\L{}}}1
+      {ł}{{\l{}}}1   {Ń}{{\'N}}1    {ń}{{\'n}}1    {Ň}{{\v{N}}}1  {ň}{{\v{n}}}1
+      {Ő}{{\H{O}}}1  {ő}{{\H{o}}}1  {Ŕ}{{\'{R}}}1  {ŕ}{{\'{r}}}1  {Ř}{{\v{R}}}1
+      {ř}{{\v{r}}}1  {Ś}{{\'S}}1    {ś}{{\'s}}1    {Ş}{{\c{S}}}1  {ş}{{\c{s}}}1
+      {Š}{{\v{S}}}1  {š}{{\v{s}}}1  {Ť}{{\v{T}}}1  {ť}{{\v{t}}}1  {Ũ}{{\~U}}1
+      {ũ}{{\~u}}1    {Ū}{{\={U}}}1  {ū}{{\={u}}}1  {Ů}{{\r{U}}}1  {ů}{{\r{u}}}1
+      {Ű}{{\H{U}}}1  {ű}{{\H{u}}}1  {Ų}{{\k{U}}}1  {ų}{{\k{u}}}1  {Ź}{{\'Z}}1
+      {ź}{{\'z}}1    {Ż}{{\.Z}}1    {ż}{{\.z}}1    {Ž}{{\v{Z}}}1
+      % ¿ and ¡ are not correctly displayed if inconsolata font is used
+      % together with the lstlisting environment. Consider typing code in
+      % external files and using \lstinputlisting to display them instead.      
+  }
 
 \hypersetup{
   colorlinks=true,
@@ -39,7 +80,7 @@
     Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}.
 
     \addcontentsline{toc}{section}{Introduction}
-    \section{Jeu de données de test}
+    \section{Jeu de données}
     Afin de faire la démonstration du modèle retenu, on utilisera \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}, qui rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}, une ONG affiliée au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
     On s'intéressera plus spécifiquement à la température mensuelle moyenne sur Terre de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv, qui se présente comme ceci :
     
@@ -79,11 +120,13 @@
         \begin{equation}\forall t : X_t = AR_t + MA_t = \sum_{i=1}^p \alpha_i X_{t-1} + \epsilon_t + \sum_{i=1}^q \beta_i \epsilon_{t-i} \end{equation}
         avec $\alpha_1,...\alpha_p$ et $\beta_1,...\beta_p$ des réels.
         \item \textbf{I - Intégration} : Le modèle ARMA a une limitation : \textbf{il ne peut modéliser que des séries de donneées stationnaires, c'est-à dire sans tendance à la baisse ou à la hausse}. Pour régler ce problème, on ajoute la composante I au modèle ARMA.
-        Cette composante élimine les dépendances des données au temps en différenciant la série temporelle, c'est-à-dire en travaillant avec $X_t - X_{t-1}$ au lieu de $X_t$. Cette différenciation est réalisée $d$ fois, $d$ étant un paramètre de notre modèle ARIMA. 
+        Cette composante élimine les dépendances des données au temps en différenciant la série temporelle, c'est-à-dire en travaillant avec $X_t - X_{t-1}$ au lieu de $X_t$. Cette différenciation est réalisée $d$ fois, $d$ étant un paramètre de notre modèle ARIMA.
+
+        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire}. Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
 
     \end{itemize}
 
-    En plus des paramètres $p$, $q$ et $d$ présentés ci-dessus, le modèle ARIMA a aussi un paramètre $m$ qui définit la saisonnalité des données, s'il y en a une. Dans la mesure où nous travaillons avec des moyennes de température mensuelles, cette valeur $m$ vaut 12 dans notre cas.
+    En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}.
     
     \subsection{Facebook Prophet}
 
@@ -115,32 +158,234 @@
 
     \section{Comparaison des modèles}
 
+    \subsection{Métrique utilisée}
+    
+    Afin de comparer les modèles considérés dans cette étude, il nous faut définir une métrique. Notre choix se portera sur la \textbf{Root-Mean-Square Error} ('racine de l'erreur quadratique moyenne' en français), souvent abrégée RMSE. Elle se définit simplement comme la racine carrée de l'erreur qudratique moyenne/mean-square error (MSE). La MSE est elle-même la moyenne de l'erreur au carré entre une valeur prédite et sa vraie valeur. Si l'on note $\check{\theta}$ la valeur prédite et $\theta$ la vraie valeur, on a :
+    
+    \begin{equation}RMSE(\check{\theta}) =  \sqrt{MSE(\check{\theta})} = \sqrt{E((\check{\theta} - \theta)^2)}\end{equation}
+
+    Deux raisons expliquent ce choix :
+    \begin{itemize}
+        \item La RMSE est utilisée comme métrique dans la plupart des sources d'informations qui ont été utilisées dans le cadre de ce dossier
+        \item La RMSE est une métrique très courante qui a l'avantage de ne pas donner une importance disproportionnée à quelques valeurs extrêmes, contrairement à la MSE.
+    \end{itemize}
+
     \subsection{Présentation des sources}
 
     Les comparaisons ci-dessous s'appuient sur les travaux publiés dans des publications scientifiques et des sites web spécialisés dont la liste complète est disponible dans la bibliographie. Parmi ceux-là, on pourra notamment citer :
     \begin{itemize}
-        \item \href{https://repository.tudelft.nl/islandora/object/uuid:29fcfb96-3e96-4b11-93ec-217ba69ea412/datastream/OBJ/download}{Cette étude} de la Delft University of Technology qui compare les trois modèles pour la prévision de traffic 
-        \item \href{https://arxiv.org/pdf/2107.12770.pdf}{Cette comparaison} d'ARIMA, de Facebook Prophet et de modèles combinant le LSTM à des CNN, par l'Université de Perugia. Ces modèles sont appliqués à la prédiction de prix de vente de produits alimentaires
-        \item \href{https://neptune.ai/blog/arima-vs-prophet-vs-lstm}{Cet article} du fournisseur de soutions de MLOps Neptune.ai qui compare les performances de ces modèles sur des données boursières.
+        \item Une étude par Ziyar Uzel et al., de la Delft University of Technology\cite{uzel}, qui compare les trois modèles pour la prévision de traffic 
+        \item Une comparaison d'ARIMA, de Facebook Prophet et de modèles combinant le LSTM à des CNN, par Lorenzo Menculini et al.\cite{menculini}. Ces modèles sont appliqués à la prédiction de prix de vente de produits alimentaires
+        \item Un article du fournisseur de soutions de MLOps Neptune.ai\cite{neptune} qui compare les performances de ces modèles sur des données boursières.
     \end{itemize}
 
     \subsection{Conclusions des sources choisies}
     Bien que toutes les sources n'arrivent pas à un consensus évident, on peut tout de même en dégager plusieurs conclusions.
-    Dans leur étude réalisée à l'Univesité de Perugia sur les prix de vente de produits alimentaires, Lorenzo Menculini et al. arrivent aux conclusions suivantes en comparant les performances des trois modèles :
+    L'étude de Ziyar Uzel et al.\cite{uzel} sur les données de traffic montre que :
+    \begin{itemize}
+        \item ARIMA offre les meilleures performances, suivi des LSTM puis de Facebook Prophet.
+        \item Pour expliquer la supériorité d'ARIMA sur les LSTM dans le contexte, l'auteur émet l'hypothèse que le dataset n'est pas assez grand pour les LSTM. Il suppose par ailleurs que le LSTM a de moins bonnes performances car son architecture ne comporte aucune information spatiale qui serait pertinente pour prédire le traffic.
+    \end{itemize}
+    La table 1 présente la RMSE (\textit{Root Mean-Squared Error}) obtenue avec chaque modèle.
+    \begin{table}[h!]
+        \begin{center}
+            \begin{tabular}{ |c|c| }
+                \hline
+                Modèle & RMSE \\
+                \hline
+                ARIMA & 5.5 \\ 
+                \hline
+                LSTM & 7.13 \\  
+                \hline
+                Facebook Prophet & 8.02 \\
+                \hline
+            \end{tabular}
+            \caption{RMSE obtenue avec chaque modèle (métrique calculée sur les données de test après finetuning) - Ziyar Uzel et al.}
+            \label{table:1}
+        \end{center}
+    \end{table}
+    
+    Dans leur étude réalisée à l'Univesité de Perugia sur les prix de vente de produits alimentaires, Lorenzo Menculini et al.\cite{menculini} arrivent aux conclusions suivantes en comparant les performances des trois modèles :
     \begin{itemize}
         \item  Facebook Prophet produit des prédictions moins précises que les LSTM et ARIMA. Cependant, le modèle s'avère très simple et rapide d'utilisation, sans avoir besoin de beaucoup de nettoyage préalable sur les données.
         \item Les LSTM ont les meilleurs performances des trois modèles testés, mais aussi un temps d'entraînement largement plus long.
         \item ARIMA a une précision supérieure à Facebook Prophet et inférieure au LSTM, mais un temps d'entraînement très court comparé à ces derniers.
     \end{itemize}
-    Voici les performances calculées pour chaque modèle dans le cadre de cette étude. On remarquera que les modèles ont été testés sur trois produits différents :
-    RMSE obtenue pour chaque modèle :
-    \begin{center}
-        \begin{tabular}{ |c| c| c| c| }
-            Produit & 1 & 2 & 3 \\
-            ARIMA & cell1 & cell2 & cell3 \\ 
-            LSTM & cell4 & cell5 & cell6 \\  
-            Facebook Prophet & cell7 & cell8 & cell9    
-        \end{tabular}
-    \end{center}
+    Voici les performances calculées pour chaque modèle dans le cadre de cette étude. On remarquera que les modèles ont été testés sur trois produits différents.
+    \begin{table}[h!]
+        \begin{center}
+            \begin{tabular}{ |c| c| c| c| }
+                \hline
+                Produit & 1 & 2 & 3 \\
+                \hline
+                ARIMA & 0.0758 & 0.173 & 0.215 \\ 
+                \hline
+                LSTM & 0.0613 & 0.162 & 0.200 \\  
+                \hline
+                Facebook Prophet & 0.0812 & 0.220 & 0.350 \\
+                \hline
+            \end{tabular}
+            \caption{RMSE obtenue avec chaque modèle (métrique calculée sur les données de test après finetuning) - Lorenzo Menculini et al.}
+            \label{table:1}
+        \end{center}
+    \end{table}
+    
+    Enfin, dans son article publié sur neptune.ai\cite{neptune}, \href{https://www.linkedin.com/in/konstantin-kutzkov-%F0%9F%87%BA%F0%9F%87%A6-10a98667/?originalSubdomain=bg}{Konstantin Kutzkov} compare les trois modèles avec des données boursières. Les conclusions sont les suivantes :
+    \begin{itemize}
+        \item ARIMA offre les meilleures performances, suivi de Facebook Prophet puis des LSTM
+        \item La sélection des hyperparamètres d'ARIMA et des LSTM a un impact considérable sur les performances du modèle.
+    \end{itemize}
+
+    La table 3 présente les résultats obtenus par chaque modèle.
+    \begin{table}[h!]
+        \begin{center}
+            \begin{tabular}{ |c|c| }
+                \hline
+                Modèle & RMSE \\
+                \hline
+                ARIMA & 224.324 \\ 
+                \hline
+                LSTM & 694.612 \\  
+                \hline
+                Facebook Prophet & 317.081 \\
+                \hline
+            \end{tabular}
+            \caption{RMSE obtenue avec chaque modèle (métrique calculée sur les données de test après finetuning) - Konstantin Kutzkov, Neptune.AI}
+            \label{table:1}
+        \end{center}
+    \end{table}
+
+    \subsection{Conclusion et choix du modèle}
+    À l'aide des informations ci-dessus, nous pouvons maintenant choisir en toute connaissance de cause le meilleur modèle pour notre problématique.
+
+    Comme nous l'avons dit en début de dossier, les performances sont le critère le plus important dans notre choix, avant la facilité d'utilisation et la rapidité de mise en place. Facebook Prophet paraît donc inadapté à notre problème, au vu de ses performances inférieures à celles des autres modèles.
+
+    En termes de performances, ARIMA et les LSTM paraissent sur un pied d'égalité. Cependant, ARIMA semble être un meilleur choix. En effet, le LSTM a besoin de beaucoup de données pour donner de bons résultats. Or, notre dataset contient une seule série de 2000 features, avec une seule feature. Cela risque de ne pas être suffisant pour obtenir des prédictions fiables. Notre choix se portera donc sur un modèle ARIMA.
+    
+    \section{Mise en place d'ARIMA}
+
+    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API.
+
+    \subsection{Chargement des données et analyses préliminaires}
+
+    La première étape consiste à charger nos données. Le code Python suivant est un exemple de comment charger nos données météorologiques dans une dataframe Pandas :
+    \begin{lstlisting}[language=Python]
+        import pandas as pd
+        # On charge le fichier csv qui se trouve dans un sous-dossier 'data'
+        data = pd.read_csv("./data/GlobalTemperatures.csv")
+        # On charge les températures moyennes (terre et océan confondus) dans une série de données Pandas,
+        # à partir de la 1300ème ligne (il n'y a aucune donnée avant cela).
+        # On réalise aussi une interpolation pour remplir automatiquement certaines valeurs manquantes
+        temperature = data["LandAndOceanAverageTemperature"].interpolate(limit_direction="backward")[1300:]
+        dates = pd.to_datetime(data["dt"])[1300:]
+    \end{lstlisting}
+
+    Comme nous l'avons fait remarquer dans la section qui traite du modèle ARIMA, la différenciation réalisée par le modèle ne permet pas de stationariser tous les types de séries temporelles. Pour nous assurer que la différenciation est bien adaptée à notre cas, nous allons réaliser une différenciation sur nos données, puis tester leur stationarité.
+    La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationaires ou non. On comparera cette p-value à un seuil défini à 5\% : si notre p-value est inférieure à ce seuil, nos données sont stationaires. Sinon, elles ne le sont pas. Voici le code qui réalise cette opération en Python :
+    \begin{lstlisting}[language=Python]
+    from statsmodels.tsa.stattools import adfuller
+
+    def make_stationary(time_series):
+        """
+        Makes a time series stationary while the p-value computed using the ADF test is higher than 0.05
+        """
+        test_results = adfuller(time_series)
+        p_value = test_results[1]
+        if p_value > 0.05: # i.e. if the data is not stationary
+            # Differentiating until the p-value gets below 0.05
+            diff_data = time_series.copy()
+            for degree in range(1, 10):
+                diff_data = diff_data.diff().dropna()
+                if adfuller(diff_data)[1] <= 0.05:
+                    return diff_data, degree
+            
+            raise ValueError(f"Unable to stationarize data after {degree} times")
+        return time_series
+    
+    diff_temp, diff_degree = make_stationary(temperature)
+    print(f"Degrees of differentiating: {diff_degree}")
+    \end{lstlisting}
+
+    Dans notre cas, exécuter ce script nous permet de stationariser nos données avec une différenciation de degré 1. Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
+
+    \subsection{Entraînement du modèle et sélection des hyperparamètres}
+
+    Nous utiliserons l'implémentation de modèle SARIMA proposée par le module \href{https://pypi.org/project/pmdarima/}{pmdarima}. Ce module propose la fonction pmdarima.arima.auto\_arima, qui recherche automatiquement les meilleurs paramètres pour notre modèle :
+    \begin{lstlisting}[language=Python]
+    # Recherche des meilleurs paramètres pour notre ARIMA
+    # Comme nous avons déjà déterminé que notre degré de différenciation
+    # est de 1, nous pouvons le préciser à auto_arima pour gagner du temps
+    # d'exécution
+    from pmdarima import auto_arima
+    # On choisit une valeur de 12 pour la saisonnalité car nos données
+    # sont des moyennes mensuelles
+    best_model = auto_arima(train, seasonal=True, d=1, m=12, trace=True)
+    print(best_model)
+    \end{lstlisting}
+
+    L'exécution de ce code nous donne la sortie suivante : \textbf{"Best model:  ARIMA(1,1,1)(2,0,1)[12] intercept"}. Les paramètres indiqués sont ceux qui offrent les meilleures performances avec notre jeu de données.
+
+    \subsection{Prédictions}
+
+    Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. Le bloc de code ci-dessous entraîne notre modèle puis réalise une prédiction que l'on peut ensuite comparer visuellement à nos données réelles (notre jeu de données de test).
+    \begin{lstlisting}[language=Python]
+    from pmdarima.arima import ARIMA
+
+    # On instancie notre modèle avec les hyperparamètres définis plus tôt
+    model = ARIMA(
+        order=(1, 1, 1),
+        seasonal_order=(2, 0, 1, 12)
+                )
+    model.fit(train)
+
+    predictions_count = len(test)
+    # On réalise des prédictions à comparer avec les valeurs de test
+    forecast, confidence_intervals = model.predict(predictions_count, return_conf_int=True) 
+    \end{lstlisting}
+
+    On peut ensuite visualiser les prédictions de notre modèle. La figure 3 présente les prédictions de notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test.
+
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{forecast}
+        \centering
+        \caption{Prédictions de notre modèle SARIMA}
+        \centering
+    \end{figure}
+
+    Le code fonction suivant permet quant à lui de calculer la RMSE, ce qui nous sera bien utile dans le cadre du monitoring du modèle :
+    \begin{lstlisting}[language=Python]
+    # Calcul de la RMSE
+    import math
+    from sklearn.metrics import mean_squared_error
+    
+    def rmse(true_values, predicted_values):
+        """
+        Computes the Root Mean-Squared Error of the predicted values with 
+        regard to the actual values.
+        """
+        return math.sqrt(mean_squared_error(true_values, predicted_values))
+    
+    # Exemple avec nos prédictions :
+    print(f"RMSE : {rmse(test, forecast)}")
+    \end{lstlisting}
+
+
+    \subsection{Déploiement}
+
+    Une fois le modèle entraîné, il est temps de le déployer sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes.
+    Dans notre cas, nous aurons besoin de définir un endpoint pour 
+
+    \subsection{Monitoring du modèle}
+    (Pas forcément de code à mettre, il faut seulement parler des métriques de performances à utiliser et des mécanismes de monitoring qui peuvent être mis en place)
+
+    \newpage
+    \begin{thebibliography}{4}
+        \bibitem[1]{menculini} Menculini, L.; Marini, A.; Proietti, M.; Garinei, A.; Bozza, A.; Moretti, C.; Marconi, M. Comparing Prophet and Deep Learning to ARIMA in Forecasting Wholesale Food Prices. Forecasting 2021, 3, 644-662. https://doi.org/10.3390/forecast3030040
+        \bibitem[2]{uzel} ÜZEL, Ziyar. Comparative Analysis of LSTM, ARIMA, and Facebook’s Prophet for Traffic Forecasting: Advancements, Challenges, and Limitations. 2023. 
+        \bibitem[3]{neptune} Kutzkov, Konstantin. ARIMA vs Prophet vs LSTM for Time Series Prediction. 2023. https://neptune.ai/blog/arima-vs-prophet-vs-lstm
+        \bibitem[4]{medium} Tum, Phylypo. Overview of Time Series Forecasting from Statistical to Recent ML Approaches. 2020. https://medium.com/@phylypo/overview-of-time-series-forecasting-from-statistical-to-recent-ml-approaches-c51a5dd4656a
+    \end{thebibliography}
+
+    AJOUTER LE CODE COMPLET EN ANNEXE
 
     \end{document}
