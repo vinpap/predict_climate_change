@@ -398,21 +398,43 @@
     print(f"RMSE : {rmse(test, forecast)}")
     \end{lstlisting}
 
+    \subsection{Monitoring du modèle}
+    
+    Une fois notre modèle entraîné, il est important de mettre des mécanismes en place pour s'assurer que ses prédictions restent suffisamment précises sur la durée. En effet, un problème courant lorsque l'on travaille avec des modèles de séries temporelles est le \textbf{data drift}. Le data drift désigne le phénomène qui arrive lorsque la relation entre nos valeurs prédites $Y$ et nos features $X$ change au fil du temps. Le data drift est particulièrement courant lorsque l'on travaille avec des données non stationnaires, comme dans notre cas.
+    
+    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe en-dessous d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes. On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
+    
+    Pour fonctionner ce script aura besoin d'accéder aux derniers relevés de température, qui pourront être stockés dans une base de données. Le script lui-même pourra être déployé sur un service tel qu'Azure Function, qui s'occupera de l'exécuter à intervalles réguliers.
+
 
     \subsection{Déploiement}
 
-    Une fois le modèle entraîné, il est temps de le déployer sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes.
+    Il est temps de déployer le modèle sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes.
     Dans notre cas, nous aurons besoin de définir les endpoints suivants :
     \begin{itemize}
-        \item predict
-        \item train
-        \item test ?? (pas sûr)
+        \item \textbf{predict} : permet de prédire toutes les températures moyennes mensuelles comprises dans une plage de dates
+        \item \textbf{train} : entraîne le modèle SARIMA
+        \item \textbf{test} : prédit les températures mensuelles moyennes dans une plage de dates, puis compare ces prédictions aux températures relevées aux mêmes dates et calcule la RMSE.
     \end{itemize}
 
-    \subsection{Monitoring du modèle}
-    
-    Une fois notre modèle entraîné et déployé, il est important de mettre des mécanismes en place pour s'assurer que ses prédictions restent suffisamment précises sur la durée. En effet, un problème courant lorsque l'on travaille avec des modèles de séries temporelles est le \textbf{data drift}. Le data drift désigne le phénomène qui arrive lorsque la relation entre nos valeurs prédites $Y$ et nos features $X$ change au fil du temps. Le data drift est particulièrement courant lorsque l'on travaille avec des données non stationnaires, comme dans notre cas.
-    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe en-dessous d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes.
+    PARLER DU TYPE DE REQUÊTES À ENVOYER AUX ENDPOINTS + LES BONS PARAMÈTRES
+
+    Quelques remarques importantes :
+    \begin{itemize}
+        \item Seuls les utilisateurs autorisés pourront utiliser cette API. Pour s'en assurer, ceux-ci devront fournir avec chaque requête un token de sécurité.
+    \end{itemize}
+
+    DONNER UN EXEMPLE DE SCRIPT UTILISANT FASTAPI QUI MET EN PLACE CES TROIS ENDPOINTS
+
+    La figure 4 récapitule le fonctionnement de notre API et ses interactions avec les autres composants :
+
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{schema_API_E2}
+        \centering
+        \caption{Fonctionnement de l'API sur laquelle est déployée notre modèle SARIMA}
+        \centering
+    \end{figure}
+
 
     \newpage
     \begin{thebibliography}{4}
@@ -422,6 +444,6 @@
         \bibitem[4]{medium} Tum, Phylypo. Overview of Time Series Forecasting from Statistical to Recent ML Approaches. 2020. https://medium.com/@phylypo/overview-of-time-series-forecasting-from-statistical-to-recent-ml-approaches-c51a5dd4656a
     \end{thebibliography}
 
-    AJOUTER LE CODE COMPLET EN ANNEXE
+    AJOUTER PLUS DE CODE EN ANNEXE
 
     \end{document}
