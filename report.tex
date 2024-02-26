@@ -9,6 +9,7 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{parskip}
 
 \addto{\captionsenglish}{\renewcommand{\bibname}{Bibliographie}}
 
@@ -77,6 +78,7 @@
 }
 
 \lstset{style=mystyle}
+\setlength{\parindent}{0pt}
 
 \hypersetup{
   colorlinks=true,
@@ -108,6 +110,7 @@
     \pagenumbering{arabic}
 
     \section*{Introduction}
+
     Un grand organisme de prédiction météorologique nous contacte. Afin de prédire au mieux l'évolution du climat à échelle mondiale dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne, en cherchant la meilleure précision possible. Ils nous demandent par ailleurs de leur fournir les instructions nécessaires à la mise en place et l'utlisation de ce modèle.
     
     Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}. Par ailleurs, certains extraits de code seront disponibles dans les annexes de ce rapport.
