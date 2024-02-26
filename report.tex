@@ -90,7 +90,10 @@
     \bigskip
     \large E2 - Cas pratique \\ 
     Développeur en Intelligence Artificielle,
-    titre professionnel enregistré au RNCP - École IA Microsoft by Simplon}
+    titre professionnel enregistré au RNCP - École IA Microsoft by Simplon
+    \vfill
+    \includegraphics[width=14cm]{global_warming.jpg} % also works with logo.pdf
+    \vfill}
 \date{12 février 2024}
 \author{par Vincent Papelard}
 
@@ -106,7 +109,8 @@
 
     \section*{Introduction}
     Un grand organisme de prédiction météorologique nous contacte. Afin de prédire au mieux l'évolution du climat à échelle mondiale dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissant par un modèle d'IA moderne, en cherchant la meilleure précision possible. Ils nous demandent par ailleurs de leur fournir les instructions nécessaires à la mise en place et l'utlisation de ce modèle.
-    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}.
+    
+    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}. Par ailleurs, certains extraits de code seront disponibles dans les annexes de ce dossier.
 
     \addcontentsline{toc}{section}{Introduction}
     \section{Jeu de données}
@@ -130,7 +134,7 @@
         \item \textbf{Réseaux LSTM (Long Short-Term Memory)}
     \end{itemize} 
     
-    Ces modèles ont été spécifiquement choisis car ils sont largement utilisés et il existe beaucoup de littérature scientifique à leur sujet. Il nous sera ainsi possible de nous baser sur la littérature scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est abordé dans la section suivante.
+    Ces modèles ont été spécifiquement choisis car ils sont largement utilisés et il existe beaucoup de ressources à leur sujet. Il nous sera ainsi possible de nous baser sur la littérature scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est abordé dans la section suivante.
 
     \subsection{ARIMA (Autoregressive Integrated Moving Average)}
 
@@ -151,24 +155,31 @@
         \item \textbf{I - Intégration} : Le modèle ARMA a une limitation : \textbf{il ne peut modéliser que des séries de donneées stationnaires, c'est-à dire sans tendance à la baisse ou à la hausse}. Pour régler ce problème, on ajoute la composante I au modèle ARMA.
         Cette composante élimine les dépendances des données au temps en différenciant la série temporelle, c'est-à-dire en travaillant avec $X_t - X_{t-1}$ au lieu de $X_t$. Cette différenciation est réalisée $d$ fois, $d$ étant un paramètre de notre modèle ARIMA.
 
-        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire}. Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
+        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire} (PAS CLAIR, FAIRE PLUS DE RECHERCHES À CE SUJET). Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
 
     \end{itemize}
-
     En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}.
     
     \subsection{Facebook Prophet}
 
     \href{https://facebook.github.io/prophet/}{Facebook Prophet} est un modèle de prédiction sur des séries temporelles proposé par Meta. 
-    Pour réaliser des prédictions, Facebook Prophet considère les données comme la combinaison additive de quatre composants : 
+    Pour réaliser des prédictions, Facebook Prophet considère les données comme la combinaison additive de quatre composants\cite{meta} : 
     \begin{itemize}
         \item la tendance
         \item la saisonnalité annuelle
         \item la saisonnalité hebdomadaire
         \item une liste de jours feriés importants fournis par l'utilisateur.
     \end{itemize}
-    Chacune de ces composantes est gérée par un modèle distinct. La saisonalité annuelle, par exemple, est modélisée à l'aide de séries de Fourier.
-    Facebook Prophet se veut simple à mettre en place et permet de réaliser des prédictions très rapidement. Ce modèle était à l'origine développé pour être utilisé avec les données commerciales auquelles sont confrontés les data scientists de Meta, ce qui le rend plus adapté à certains types de données spécifiques (données financières ou commerciales par exemple). 
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{facebook_prophet}
+        \centering
+        \caption{Les différentes composantes qui constituent Facebook Prophet}
+        \centering
+    \end{figure}
+
+    Chacune de ces composantes est gérée par un modèle distinct. La saisonalité annuelle, par exemple, est modélisée à l'aide de séries de Fourier. Ces quatre modèles sont ensuite combinées additivement, i.e. en les additionnant.
+    
+    Facebook Prophet se veut simple à mettre en place et permet de réaliser des prédictions très rapidement. Ce modèle était à l'origine développé pour être utilisé avec les données commerciales auxquelles sont confrontés les data scientists de Meta, ce qui le rend plus adapté à certains types de données spécifiques (données financières ou commerciales par exemple). 
     
     \subsection{Réseaux LSTM (Long Short-Term Memory)}
 
@@ -293,86 +304,29 @@
     
     \section{Mise en place d'ARIMA}
 
-    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API.
+    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code couvert dans cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
 
     \subsection{Chargement des données et analyses préliminaires}
 
-    La première étape consiste à charger nos données. Le code Python suivant est un exemple de comment charger nos données météorologiques dans une dataframe Pandas :
-    \begin{lstlisting}[language=Python]
-        import pandas as pd
-        # On charge le fichier csv qui se trouve dans un sous-dossier 'data'
-        data = pd.read_csv("./data/GlobalTemperatures.csv")
-        # On charge les températures moyennes (terre et océan confondus) dans une série de données Pandas,
-        # à partir de la 1300ème ligne (il n'y a aucune donnée avant cela).
-        # On réalise aussi une interpolation pour remplir automatiquement certaines valeurs manquantes
-        temperature = data["LandAndOceanAverageTemperature"].interpolate(limit_direction="backward")[1300:]
-        dates = pd.to_datetime(data["dt"])[1300:]
-    \end{lstlisting}
+    La première étape consiste à charger nos données. Pour cela, on peut utiliser pandas pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. 
 
     Comme nous l'avons fait remarquer dans la section qui traite du modèle ARIMA, la différenciation réalisée par le modèle ne permet pas de stationariser tous les types de séries temporelles. Pour nous assurer que la différenciation est bien adaptée à notre cas, nous allons réaliser une différenciation sur nos données, puis tester leur stationarité.
-    La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationaires ou non. On comparera cette p-value à un seuil défini à 5\% : si notre p-value est inférieure à ce seuil, nos données sont stationaires. Sinon, elles ne le sont pas. Voici le code qui réalise cette opération en Python :
-    \begin{lstlisting}[language=Python]
-    from statsmodels.tsa.stattools import adfuller
-
-    def make_stationary(time_series):
-        """
-        Makes a time series stationary while the p-value computed using the ADF test is higher than 0.05
-        """
-        test_results = adfuller(time_series)
-        p_value = test_results[1]
-        if p_value > 0.05: # i.e. if the data is not stationary
-            # Differentiating until the p-value gets below 0.05
-            diff_data = time_series.copy()
-            for degree in range(1, 10):
-                diff_data = diff_data.diff().dropna()
-                if adfuller(diff_data)[1] <= 0.05:
-                    return diff_data, degree
-            
-            raise ValueError(f"Unable to stationarize data after {degree} times")
-        return time_series
-    
-    diff_temp, diff_degree = make_stationary(temperature)
-    print(f"Degrees of differentiating: {diff_degree}")
-    \end{lstlisting}
-
-    Dans notre cas, exécuter ce script nous permet de stationariser nos données avec une différenciation de degré 1. Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
-
+    La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationaires ou non. On comparera cette p-value à un seuil défini à 5\% (CLARIFIER): si notre p-value est inférieure à ce seuil, nos données sont stationaires. Sinon, elles ne le sont pas.
+    Dans notre cas, réaliser une seule différenciation nous a permis de stationariser nos données (voir la figure 4). Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{differenciating}
+        \centering
+        \caption{Visualisation de nos données, avant et après différenciation. Ici, réaliser une différenciation a permis de rendre la série temporelle stationnaire}
+        \centering
+    \end{figure}
     \subsection{Entraînement du modèle et sélection des hyperparamètres}
 
-    Nous utiliserons l'implémentation de modèle SARIMA proposée par le module \href{https://pypi.org/project/pmdarima/}{pmdarima}. Ce module propose la fonction pmdarima.arima.auto\_arima, qui recherche automatiquement les meilleurs paramètres pour notre modèle :
-    \begin{lstlisting}[language=Python]
-    # Recherche des meilleurs paramètres pour notre ARIMA
-    # Comme nous avons déjà déterminé que notre degré de différenciation
-    # est de 1, nous pouvons le préciser à auto_arima pour gagner du temps
-    # d'exécution
-    from pmdarima import auto_arima
-    # On choisit une valeur de 12 pour la saisonnalité car nos données
-    # sont des moyennes mensuelles
-    best_model = auto_arima(train, seasonal=True, d=1, m=12, trace=True)
-    print(best_model)
-    \end{lstlisting}
-
-    L'exécution de ce code nous donne la sortie suivante : \textbf{"Best model:  ARIMA(1,1,1)(2,0,1)[12] intercept"}. Les paramètres indiqués sont ceux qui offrent les meilleures performances avec notre jeu de données.
+    Nous utiliserons l'implémentation de modèle SARIMA proposée par le module \href{https://pypi.org/project/pmdarima/}{pmdarima}. Ce module propose la fonction pmdarima.arima.auto\_arima, qui recherche automatiquement les meilleurs paramètres pour notre modèle.
+    L'exécution de notre code nous donne la sortie suivante : \textbf{"Best model:  ARIMA(1,1,1)(2,0,1)[12] intercept"}. Les paramètres indiqués sont ceux qui offrent les meilleures performances avec notre jeu de données.
 
     \subsection{Prédictions}
 
-    Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. Le bloc de code ci-dessous entraîne notre modèle puis réalise une prédiction que l'on peut ensuite comparer visuellement à nos données réelles (notre jeu de données de test).
-    \begin{lstlisting}[language=Python]
-    from pmdarima.arima import ARIMA
-
-    # On instancie notre modèle avec les hyperparamètres définis plus tôt
-    model = ARIMA(
-        order=(1, 1, 1),
-        seasonal_order=(2, 0, 1, 12)
-                )
-    model.fit(train)
-
-    predictions_count = len(test)
-    # On réalise des prédictions à comparer avec les valeurs de test
-    forecast, confidence_intervals = model.predict(predictions_count, return_conf_int=True) 
-    \end{lstlisting}
-
-    On peut ensuite visualiser les prédictions de notre modèle. La figure 3 présente les prédictions de notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test.
+    Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. La figure 5 présente les prédictions obtenues par notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test. La lecture de ce graphique nous laisse penser que le modèle SARIMA a bien réussi à prédire les évolutions de notre jeu de données.
 
     \begin{figure}[h]
         \includegraphics[width=12cm]{forecast}
@@ -381,28 +335,16 @@
         \centering
     \end{figure}
 
-    Le code fonction suivant permet quant à lui de calculer la RMSE, ce qui nous sera bien utile dans le cadre du monitoring du modèle :
-    \begin{lstlisting}[language=Python]
-    # Calcul de la RMSE
-    import math
-    from sklearn.metrics import mean_squared_error
-    
-    def rmse(true_values, predicted_values):
-        """
-        Computes the Root Mean-Squared Error of the predicted values with 
-        regard to the actual values.
-        """
-        return math.sqrt(mean_squared_error(true_values, predicted_values))
-    
-    # Exemple avec nos prédictions :
-    print(f"RMSE : {rmse(test, forecast)}")
-    \end{lstlisting}
-
     \subsection{Monitoring du modèle}
     
     Une fois notre modèle entraîné, il est important de mettre des mécanismes en place pour s'assurer que ses prédictions restent suffisamment précises sur la durée. En effet, un problème courant lorsque l'on travaille avec des modèles de séries temporelles est le \textbf{data drift}. Le data drift désigne le phénomène qui arrive lorsque la relation entre nos valeurs prédites $Y$ et nos features $X$ change au fil du temps. Le data drift est particulièrement courant lorsque l'on travaille avec des données non stationnaires, comme dans notre cas.
-    
-    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe en-dessous d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes. On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{data_drift}
+        \centering
+        \caption{Illustration du phénomène de "data drift" : il faut surveiller les performances de notre modèle pour le réentraîner lorsque celles-ce se dégradent trop}
+        \centering
+    \end{figure}
+    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe au-dessus d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes. On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
     
     Pour fonctionner ce script aura besoin d'accéder aux derniers relevés de température, qui pourront être stockés dans une base de données. Le script lui-même pourra être déployé sur un service tel qu'Azure Function, qui s'occupera de l'exécuter à intervalles réguliers.
 
@@ -417,14 +359,13 @@
         \item \textbf{test} : prédit les températures mensuelles moyennes dans une plage de dates, puis compare ces prédictions aux températures relevées aux mêmes dates et calcule la RMSE.
     \end{itemize}
 
-    PARLER DU TYPE DE REQUÊTES À ENVOYER AUX ENDPOINTS + LES BONS PARAMÈTRES
+    Un point crucial est qu'il est nécessaire de \textbf{sécuriser notre API}. En l'état, celle-ci souffre d'un défaut majeur : n'importe qui peut effectuer des requêtes à notre API. Imaginons que quelqu'un sans aucun rapport avec l'organisation de météorologie que nous servons réentraîne le modèle avec ses données, ou sature les capacités de la machine qui héberge notre API en réalisant de nombreuses requêtes simultanément : ce serait un désastre !
 
-    Quelques remarques importantes :
-    \begin{itemize}
-        \item Seuls les utilisateurs autorisés pourront utiliser cette API. Pour s'en assurer, ceux-ci devront fournir avec chaque requête un token de sécurité.
-    \end{itemize}
+    Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées ! On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Il serait envisageable de conserver nos valeurs secrètes dans les variables d'environnement de la machine qui héberge notre API, ou sur un service dédié tel qu'Azure Vault. 
 
-    DONNER UN EXEMPLE DE SCRIPT UTILISANT FASTAPI QUI MET EN PLACE CES TROIS ENDPOINTS
+
+    \textbf{Remarque : }un exemple de script Python implémentant une API correspondant à nos besoins est présenté en annexe à titre d'exemple.
+
 
     La figure 4 récapitule le fonctionnement de notre API et ses interactions avec les autres composants :
 
@@ -435,15 +376,96 @@
         \centering
     \end{figure}
 
+    \section*{Conclusion}
+    Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi ARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
+    Sur une note plus personnelle, le travail réalisé pour ce projet m'a permis de mieux comprendre le fonctionnement des modèles de séries temporelles ainsi que les caractéristiques propres à ce type de données.
+
+    Pour aller plus loin, n'hésitez pas à consulter les exemples de code joints aux annexes de ce dossier. L'intégralité du code source développé dans le cadre du dossier est quant à lui disponible sur \href{https://github.com/vinpap/predict_climate_change}{GitHub}.
+
+    \addcontentsline{toc}{section}{Conclusion}
 
     \newpage
-    \begin{thebibliography}{4}
-        \bibitem[1]{menculini} Menculini, L.; Marini, A.; Proietti, M.; Garinei, A.; Bozza, A.; Moretti, C.; Marconi, M. Comparing Prophet and Deep Learning to ARIMA in Forecasting Wholesale Food Prices. Forecasting 2021, 3, 644-662. https://doi.org/10.3390/forecast3030040
-        \bibitem[2]{uzel} ÜZEL, Ziyar. Comparative Analysis of LSTM, ARIMA, and Facebook’s Prophet for Traffic Forecasting: Advancements, Challenges, and Limitations. 2023. 
+    \begin{thebibliography}{5}
+        \bibitem[1]{uzel} ÜZEL, Ziyar. Comparative Analysis of LSTM, ARIMA, and Facebook’s Prophet for Traffic Forecasting: Advancements, Challenges, and Limitations. 2023. 
+        \bibitem[2]{menculini} Menculini, L.; Marini, A.; Proietti, M.; Garinei, A.; Bozza, A.; Moretti, C.; Marconi, M. Comparing Prophet and Deep Learning to ARIMA in Forecasting Wholesale Food Prices. Forecasting 2021, 3, 644-662. https://doi.org/10.3390/forecast3030040
         \bibitem[3]{neptune} Kutzkov, Konstantin. ARIMA vs Prophet vs LSTM for Time Series Prediction. 2023. https://neptune.ai/blog/arima-vs-prophet-vs-lstm
         \bibitem[4]{medium} Tum, Phylypo. Overview of Time Series Forecasting from Statistical to Recent ML Approaches. 2020. https://medium.com/@phylypo/overview-of-time-series-forecasting-from-statistical-to-recent-ml-approaches-c51a5dd4656a
+        \bibitem[5]{meta} Sean J. Taylor, Ben Letham. Prophet Forecasting at Scale. 2017. https://research.facebook.com/blog/2017/2/prophet-forecasting-at-scale/
     \end{thebibliography}
 
-    AJOUTER PLUS DE CODE EN ANNEXE
+    \appendix
+    \newpage
+    \section*{Annexes \huge \centering}
+    \addcontentsline{toc}{section}{Annexes}
+    \section*{Exemples de code}
+    \label{sec:code}
+    \subsection*{Création et entraînement du modèle}
+    Chargement de nos données météorologiques dans une dataframe Pandas :
+    \begin{lstlisting}[language=Python]
+        import pandas as pd
+        # On charge le fichier csv qui se trouve dans un sous-dossier 'data'
+        data = pd.read_csv("./data/GlobalTemperatures.csv")
+        # On charge les températures moyennes (terre et océan confondus) dans une série de données Pandas,
+        # à partir de la 1300ème ligne (il n'y a aucune donnée avant cela).
+        # On réalise aussi une interpolation pour remplir automatiquement certaines valeurs manquantes
+        temperature = data["LandAndOceanAverageTemperature"].interpolate(limit_direction="backward")[1300:]
+        dates = pd.to_datetime(data["dt"])[1300:]
+    \end{lstlisting}
+
+    Stationarisation de notre série temporelle en utilisant le test augmenté de Dickey-Fuller :
+    \begin{lstlisting}[language=Python]
+        from statsmodels.tsa.stattools import adfuller
+    
+        def make_stationary(time_series):
+            """
+            Makes a time series stationary while the p-value computed using the ADF test is higher than 0.05
+            """
+            test_results = adfuller(time_series)
+            p_value = test_results[1]
+            if p_value > 0.05: # i.e. if the data is not stationary
+                # Differentiating until the p-value gets below 0.05
+                diff_data = time_series.copy()
+                for degree in range(1, 10):
+                    diff_data = diff_data.diff().dropna()
+                    if adfuller(diff_data)[1] <= 0.05:
+                        return diff_data, degree
+                
+                raise ValueError(f"Unable to stationarize data after {degree} times")
+            return time_series
+        
+        diff_temp, diff_degree = make_stationary(temperature)
+        print(f"Degrees of differentiating: {diff_degree}")
+    \end{lstlisting}
+
+    Entraînement du modèle et sélection des hyperparamètres :
+    \begin{lstlisting}[language=Python]
+        # Recherche des meilleurs paramètres pour notre ARIMA
+        # Comme nous avons déjà déterminé que notre degré de différenciation
+        # est de 1, nous pouvons le préciser à auto_arima pour gagner du temps
+        # d'exécution
+        from pmdarima import auto_arima
+        # On choisit une valeur de 12 pour la saisonnalité car nos données
+        # sont des moyennes mensuelles
+        best_model = auto_arima(train, seasonal=True, d=1, m=12, trace=True)
+        print(best_model)
+        \end{lstlisting}
+    
+    Réalisation de prédictions :
+    \begin{lstlisting}[language=Python]
+        from pmdarima.arima import ARIMA
+    
+        # On instancie notre modèle avec les hyperparamètres définis plus tôt
+        model = ARIMA(
+            order=(1, 1, 1),
+            seasonal_order=(2, 0, 1, 12)
+                    )
+        model.fit(train)
+    
+        predictions_count = len(test)
+        # On réalise des prédictions à comparer avec les valeurs de test
+        forecast, confidence_intervals = model.predict(predictions_count, return_conf_int=True) 
+        \end{lstlisting}
+    \subsection*{Développement de l'API REST}
+    AJOUTER UN SCRIPT QUI CRÉE L'API ET DIRE COMMENT LE LANCER
 
     \end{document}
