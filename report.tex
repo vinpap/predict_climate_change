@@ -108,14 +108,15 @@
     \pagenumbering{arabic}
 
     \section*{Introduction}
-    Un grand organisme de prédiction météorologique nous contacte. Afin de prédire au mieux l'évolution du climat à échelle mondiale dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissant par un modèle d'IA moderne, en cherchant la meilleure précision possible. Ils nous demandent par ailleurs de leur fournir les instructions nécessaires à la mise en place et l'utlisation de ce modèle.
+    Un grand organisme de prédiction météorologique nous contacte. Afin de prédire au mieux l'évolution du climat à échelle mondiale dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne, en cherchant la meilleure précision possible. Ils nous demandent par ailleurs de leur fournir les instructions nécessaires à la mise en place et l'utlisation de ce modèle.
     
-    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}. Par ailleurs, certains extraits de code seront disponibles dans les annexes de ce dossier.
+    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}. Par ailleurs, certains extraits de code seront disponibles dans les annexes de ce rapport.
 
     \addcontentsline{toc}{section}{Introduction}
     \section{Jeu de données}
-    Afin de faire la démonstration du modèle retenu, on utilisera \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}, qui rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}, une ONG affiliée au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
-    On s'intéressera plus spécifiquement à la température mensuelle moyenne sur Terre de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv, qui se présente comme ceci :
+    Afin de faire la démonstration du modèle retenu, nous utiliserons \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}. Il rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}. Berkeley Earth est affiliée au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
+    
+    Nous nous intéresserons  plus spécifiquement à la \textbf{température mensuelle moyenne sur Terre} de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv (cf figure 1).
     
     \begin{figure}[h]
         \includegraphics[width=12cm]{dataset}
@@ -124,17 +125,17 @@
         \centering
     \end{figure}
 
-    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature" (en surbrillance sur la figure), qui recense la température moyenne en degrés Celsius sur Terre chaque mois, au-dessus des continents comme des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850.
+    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature" (en surbrillance sur la figure 1), qui recense la température moyenne sur Terre chaque mois, en degrés Celsius. Cette valeur est calculée en prenant en compte à la fois les températures mesurées au-dessus des continents et celles mesurées au-dessus des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850.
     \section{Modèles de prédiction envisagés}
 
-    Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. Dans la mesure où il est impossible de tous les traiter, il a fallu faire des choix. Après recherches, les trois modèles qui seront comparés dans ce dossier sont :
+    Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. Dans la mesure où il est impossible de tous les traiter, il a fallu faire des choix. Après recherches, les trois modèles qui seront abordés dans ce dossier sont les suivants :
     \begin{itemize}
         \item \textbf{ARIMA}
         \item \textbf{Facebook Prophet}
         \item \textbf{Réseaux LSTM (Long Short-Term Memory)}
     \end{itemize} 
     
-    Ces modèles ont été spécifiquement choisis car ils sont largement utilisés et il existe beaucoup de ressources à leur sujet. Il nous sera ainsi possible de nous baser sur la littérature scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est abordé dans la section suivante.
+    Ces modèles ont été spécifiquement choisis car ils sont très utilisés et qu'il existe donc beaucoup de ressources à leur sujet. Il nous sera ainsi possible de nous baser sur la littérature technique et scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est exposé dans la section suivante.
 
     \subsection{ARIMA (Autoregressive Integrated Moving Average)}
 
@@ -142,7 +143,7 @@
     \begin{itemize}
         \item \textbf{AR - Autorégression} : ce composant calcule la valeur d'une variable à partir des $p$ dernières observations, $p$ étant un paramètre de notre modèle. Si l'on note $X_t$ la valeur de notre variable à un instant $t$, on a donc :
 
-        \begin{equation}\forall t : X_t = \sum_{i=1}^p \alpha_i X_{t-1} + \epsilon_t \end{equation}
+        \begin{equation}\forall t : X_t = \sum_{i=1}^p \alpha_i X_{t-i} + \epsilon_t \end{equation}
         avec $\epsilon$ l'erreur et $\alpha_1,...\alpha_p$ des réels.
         \item \textbf{MA - Moyenne Mobile} : la moyenne mobile (Moving Average en anglais) exprime une valeur à un instant $t$ comme une combinaison linéaire de $q$ erreurs passées :
 
@@ -150,36 +151,36 @@
 
         Pour modéliser des séries temporelles de façon plus complexe, on combine le modèle AR et le modèle MA pour créer un modèle dit "ARMA" :
 
-        \begin{equation}\forall t : X_t = AR_t + MA_t = \sum_{i=1}^p \alpha_i X_{t-1} + \epsilon_t + \sum_{i=1}^q \beta_i \epsilon_{t-i} \end{equation}
+        \begin{equation}\forall t : X_t = AR_t + MA_t = \sum_{i=1}^p \alpha_i X_{t-i} + \epsilon_t + \sum_{i=1}^q \beta_i \epsilon_{t-i} \end{equation}
         avec $\alpha_1,...\alpha_p$ et $\beta_1,...\beta_p$ des réels.
         \item \textbf{I - Intégration} : Le modèle ARMA a une limitation : \textbf{il ne peut modéliser que des séries de donneées stationnaires, c'est-à dire sans tendance à la baisse ou à la hausse}. Pour régler ce problème, on ajoute la composante I au modèle ARMA.
         Cette composante élimine les dépendances des données au temps en différenciant la série temporelle, c'est-à-dire en travaillant avec $X_t - X_{t-1}$ au lieu de $X_t$. Cette différenciation est réalisée $d$ fois, $d$ étant un paramètre de notre modèle ARIMA.
 
-        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire} (PAS CLAIR, FAIRE PLUS DE RECHERCHES À CE SUJET). Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
+        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationnarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire} (PAS CLAIR, FAIRE PLUS DE RECHERCHES À CE SUJET). Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
 
     \end{itemize}
     En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}.
     
     \subsection{Facebook Prophet}
 
-    \href{https://facebook.github.io/prophet/}{Facebook Prophet} est un modèle de prédiction sur des séries temporelles proposé par Meta. 
+    \href{https://facebook.github.io/prophet/}{Facebook Prophet} est un modèle de prédiction proposé par Meta. 
     Pour réaliser des prédictions, Facebook Prophet considère les données comme la combinaison additive de quatre composants\cite{meta} : 
     \begin{itemize}
         \item la tendance
         \item la saisonnalité annuelle
         \item la saisonnalité hebdomadaire
-        \item une liste de jours feriés importants fournis par l'utilisateur.
+        \item une liste de jours feriés importants fournie par l'utilisateur.
     \end{itemize}
     \begin{figure}[h]
         \includegraphics[width=12cm]{facebook_prophet}
         \centering
-        \caption{Les différentes composantes qui constituent Facebook Prophet}
+        \caption{Les différentes composantes de Facebook Prophet}
         \centering
     \end{figure}
 
-    Chacune de ces composantes est gérée par un modèle distinct. La saisonalité annuelle, par exemple, est modélisée à l'aide de séries de Fourier. Ces quatre modèles sont ensuite combinées additivement, i.e. en les additionnant.
+    Chacune de ces composantes est gérée par un modèle distinct. La saisonnalité annuelle, par exemple, est modélisée à l'aide de séries de Fourier. Ces quatre modèles sont ensuite combinés additivement.
     
-    Facebook Prophet se veut simple à mettre en place et permet de réaliser des prédictions très rapidement. Ce modèle était à l'origine développé pour être utilisé avec les données commerciales auxquelles sont confrontés les data scientists de Meta, ce qui le rend plus adapté à certains types de données spécifiques (données financières ou commerciales par exemple). 
+    Facebook Prophet se veut simple à mettre en place et permet de réaliser des prédictions très rapidement. Ce modèle était à l'origine développé pour être utilisé avec les données commerciales auxquelles sont souvent confrontés les data scientists de Meta, ce qui le rend plus adapté à certains types de données spécifiques (données financières ou commerciales par exemple). 
     
     \subsection{Réseaux LSTM (Long Short-Term Memory)}
 
@@ -194,13 +195,13 @@
         \centering
     \end{figure}
 
-    Loin d'être propres aux séries temporelles, les LSTM sont utilisés pour répondre à de nombreux problèmes tels que la traduction automatique ou la génération de langage naturel.
+    Loin d'être propres aux séries temporelles, les LSTM sont utilisés pour répondre à de nombreux problèmes tels que la traduction automatique, la génération de texte ou encore l'analyse de vidéos.
 
     \section{Comparaison des modèles}
 
     \subsection{Métrique utilisée}
     
-    Afin de comparer les modèles considérés dans cette étude, il nous faut définir une métrique. Notre choix se portera sur la \textbf{Root-Mean-Square Error} ('racine de l'erreur quadratique moyenne' en français), souvent abrégée RMSE. Elle se définit simplement comme la racine carrée de l'erreur qudratique moyenne/mean-square error (MSE). La MSE est elle-même la moyenne de l'erreur au carré entre une valeur prédite et sa vraie valeur. Si l'on note $\check{\theta}$ la valeur prédite et $\theta$ la vraie valeur, on a :
+    Afin de comparer les modèles considérés dans cette étude, il nous faut définir une métrique. Notre choix se portera sur la \textbf{Root-Mean-Square Error} ('racine de l'erreur quadratique moyenne' en français), souvent abrégée RMSE. Elle se définit simplement comme la racine carrée de l'erreur quadratique moyenne/mean-square error (MSE). La MSE est elle-même la moyenne du carré de l'erreur entre une valeur prédite et sa vraie valeur. Si l'on note $\check{\theta}$ la valeur prédite et $\theta$ la vraie valeur, on a :
     
     \begin{equation}RMSE(\check{\theta}) =  \sqrt{MSE(\check{\theta})} = \sqrt{E((\check{\theta} - \theta)^2)}\end{equation}
 
@@ -209,6 +210,13 @@
         \item La RMSE est utilisée comme métrique dans la plupart des sources d'informations qui ont été utilisées dans le cadre de ce dossier
         \item La RMSE est une métrique très courante qui a l'avantage de ne pas donner une importance disproportionnée à quelques valeurs extrêmes, contrairement à la MSE.
     \end{itemize}
+
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{mse}
+        \centering
+        \caption{Schématisation du concept de la MSE. La MSE correspond ici à la moyenne des surfaces de tous les carrés. Pour obtenir la RMSE il suffit de calculer la racine carrée de la MSE}
+        \centering
+    \end{figure}
 
     \subsection{Présentation des sources}
 
@@ -295,24 +303,24 @@
         \end{center}
     \end{table}
 
-    \subsection{Conclusion et choix du modèle}
+    \subsection{Bilan et choix du modèle}
     À l'aide des informations ci-dessus, nous pouvons maintenant choisir en toute connaissance de cause le meilleur modèle pour notre problématique.
 
     Comme nous l'avons dit en début de dossier, les performances sont le critère le plus important dans notre choix, avant la facilité d'utilisation et la rapidité de mise en place. Facebook Prophet paraît donc inadapté à notre problème, au vu de ses performances inférieures à celles des autres modèles.
 
-    En termes de performances, ARIMA et les LSTM paraissent sur un pied d'égalité. Cependant, ARIMA semble être un meilleur choix. En effet, le LSTM a besoin de beaucoup de données pour donner de bons résultats. Or, notre dataset contient une seule série de 2000 features, avec une seule feature. Cela risque de ne pas être suffisant pour obtenir des prédictions fiables. Notre choix se portera donc sur un modèle ARIMA.
+    En termes de performances, ARIMA et les LSTM paraissent sur un pied d'égalité. Cependant, ARIMA semble être un meilleur choix. En effet, le LSTM a besoin de beaucoup de données pour produire de bons résultats. Or, notre dataset contient une seule série de 2000 échantillons, avec une seule feature. Cela risque de ne pas être suffisant pour obtenir des prédictions fiables. Notre choix se portera donc sur un modèle ARIMA (plus précisément sur un modèle \textbf{SARIMA}, puisque nos données comportent une saisonnalité).
     
     \section{Mise en place d'ARIMA}
 
-    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code couvert dans cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
+    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code relatif à cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
 
     \subsection{Chargement des données et analyses préliminaires}
 
-    La première étape consiste à charger nos données. Pour cela, on peut utiliser pandas pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. 
+    La première étape consiste à charger nos données. Pour cela, nous utiliserons \textbf{pandas} pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. 
 
     Comme nous l'avons fait remarquer dans la section qui traite du modèle ARIMA, la différenciation réalisée par le modèle ne permet pas de stationariser tous les types de séries temporelles. Pour nous assurer que la différenciation est bien adaptée à notre cas, nous allons réaliser une différenciation sur nos données, puis tester leur stationarité.
-    La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationaires ou non. On comparera cette p-value à un seuil défini à 5\% (CLARIFIER): si notre p-value est inférieure à ce seuil, nos données sont stationaires. Sinon, elles ne le sont pas.
-    Dans notre cas, réaliser une seule différenciation nous a permis de stationariser nos données (voir la figure 4). Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
+    La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationnaires ou non. Si notre p-value est inférieure à un seuil fixé à 0.05, nos données sont stationaires. Sinon, elles ne le sont pas.
+    Dans notre cas, réaliser une seule différenciation nous a permis de stationnariser nos données (voir la figure 5). Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
     \begin{figure}[h]
         \includegraphics[width=12cm]{differenciating}
         \centering
@@ -326,7 +334,7 @@
 
     \subsection{Prédictions}
 
-    Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. La figure 5 présente les prédictions obtenues par notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test. La lecture de ce graphique nous laisse penser que le modèle SARIMA a bien réussi à prédire les évolutions de notre jeu de données.
+    Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. La figure 6 présente les prédictions obtenues par notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test. La lecture de ce graphique nous laisse penser que le modèle SARIMA a bien réussi à prédire les évolutions de notre jeu de données.
 
     \begin{figure}[h]
         \includegraphics[width=12cm]{forecast}
@@ -364,10 +372,7 @@
     Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées ! On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Il serait envisageable de conserver nos valeurs secrètes dans les variables d'environnement de la machine qui héberge notre API, ou sur un service dédié tel qu'Azure Vault. 
 
 
-    \textbf{Remarque : }un exemple de script Python implémentant une API correspondant à nos besoins est présenté en annexe à titre d'exemple.
-
-
-    La figure 4 récapitule le fonctionnement de notre API et ses interactions avec les autres composants :
+    La figure 8 récapitule le fonctionnement de notre API et ses interactions avec les autres composants.
 
     \begin{figure}[h]
         \includegraphics[width=12cm]{schema_API_E2}
@@ -376,6 +381,7 @@
         \centering
     \end{figure}
 
+    \newpage
     \section*{Conclusion}
     Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi ARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
     Sur une note plus personnelle, le travail réalisé pour ce projet m'a permis de mieux comprendre le fonctionnement des modèles de séries temporelles ainsi que les caractéristiques propres à ce type de données.
@@ -466,6 +472,6 @@
         forecast, confidence_intervals = model.predict(predictions_count, return_conf_int=True) 
         \end{lstlisting}
     \subsection*{Développement de l'API REST}
-    AJOUTER UN SCRIPT QUI CRÉE L'API ET DIRE COMMENT LE LANCER
+    AJOUTER UN SCRIPT QUI CRÉE L'API ET DIRE COMMENT LE LANCER ??
 
     \end{document}
