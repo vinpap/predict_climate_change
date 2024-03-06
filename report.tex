@@ -172,7 +172,7 @@
         \item \textbf{I - Intégration} : Le modèle ARMA a une limitation : \textbf{il ne peut modéliser que des séries de donneées stationnaires, c'est-à dire sans tendance à la baisse ou à la hausse}. Pour régler ce problème, on ajoute la composante I au modèle ARMA.
         Cette composante élimine les dépendances des données au temps en différenciant la série temporelle, c'est-à-dire en travaillant avec $X_t - X_{t-1}$ au lieu de $X_t$. Cette différenciation est réalisée $d$ fois, $d$ étant un paramètre de notre modèle ARIMA.
 
-        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationnarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire} (PAS CLAIR, FAIRE PLUS DE RECHERCHES À CE SUJET). Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
+        \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationnarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire}. Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
 
     \end{itemize}
     En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}.
