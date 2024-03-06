@@ -11,8 +11,6 @@
 \usepackage{xcolor}
 \usepackage{parskip}
 
-\addto{\captionsenglish}{\renewcommand{\bibname}{Bibliographie}}
-
 \lstset{
     inputencoding = utf8,  % Input encoding
     extendedchars = true,  % Extended ASCII
@@ -94,13 +92,14 @@
     Développeur en Intelligence Artificielle,
     titre professionnel enregistré au RNCP - École IA Microsoft by Simplon
     \vfill
-    \includegraphics[width=14cm]{global_warming.jpg} % also works with logo.pdf
+    \includegraphics[width=14cm]{global_warming.jpg}
     \vfill}
 \date{12 février 2024}
 \author{par Vincent Papelard}
 
 \begin{document}
     \renewcommand{\contentsname}{Table des Matières}
+    \renewcommand{\refname}{Références}
     \maketitle
     \pagenumbering{arabic}
     \pagenumbering{gobble}
@@ -111,24 +110,38 @@
 
     \section*{Introduction}
 
-    Un grand organisme de prédiction météorologique nous contacte. Afin de prédire au mieux l'évolution du climat à échelle mondiale dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne, en cherchant la meilleure précision possible. Ils nous demandent par ailleurs de leur fournir les instructions nécessaires à la mise en place et l'utlisation de ce modèle.
+    Un grand organisme de prédiction météorologique nous contacte. 
+    Afin de prédire au mieux l'évolution du climat à échelle mondiale et dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne en cherchant la meilleure précision possible. Plus spécifiquement, ils nous demandent un modèle capable de prédire l'évolution des températures moyennes sur Terre sur de longues périodes. Ils insistent notamment sur les points suivants :
+    \begin{itemize}
+        \item l'organisation disposant de serveurs ultra-performants, la puissance de calcul n'est pas un problème.
+        \item afin d'éviter les erreurs de prédiction et pour que le public continue à faire confiance aux prédictions météorologiques, le modèle proposé devra être celui qui offre la meilleure précision.
+        \item des instructions expliquant la mise en place et l'utilisation du modèle devront être fournies.
+    \end{itemize}
     
-    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}. Par ailleurs, certains extraits de code seront disponibles dans les annexes de ce rapport.
+    Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}.
 
     \addcontentsline{toc}{section}{Introduction}
     \section{Jeu de données}
-    Afin de faire la démonstration du modèle retenu, nous utiliserons \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}. Il rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}. Berkeley Earth est affiliée au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
+    
+    Afin de faire la démonstration du modèle retenu, nous utiliserons \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}. Il rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}. Berkeley Earth est associé au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
+
+    Ce jeu de données a été choisi pour plusieurs raisons :
+    \begin{itemize}
+        \item il couvre une longue période, allant de 1750 pour les relevés les plus anciens jusqu'à 2015. Dans la mesure où nous nous intéressons à l'évolution des températures sur le long terme, il paraît important de disposer de données remontant suffisamment loin dans le passé.
+        \item il provient d'une source fiable : Berkeley Earth est une organisation reconnue par le gouvernement américain dont la direction est majoritairement composée de chercheurs.
+        \item les données fournies sont des moyennes mensuelles de température. Cette granularité nous permet de capturer des informations sur l'évolution des températures au fil des saisons, ce que ne permettraient pas des moyennes annuelles par exemple.
+    \end{itemize}
     
     Nous nous intéresserons  plus spécifiquement à la \textbf{température mensuelle moyenne sur Terre} de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv (cf figure 1).
     
-    \begin{figure}[h]
+    \begin{figure}[h!]
         \includegraphics[width=12cm]{dataset}
         \centering
         \caption{Table GlobalTemperatures.csv}
         \centering
     \end{figure}
 
-    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature" (en surbrillance sur la figure 1), qui recense la température moyenne sur Terre chaque mois, en degrés Celsius. Cette valeur est calculée en prenant en compte à la fois les températures mesurées au-dessus des continents et celles mesurées au-dessus des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850.
+    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature" (en surbrillance sur la figure 1), qui recense la température moyenne sur Terre chaque mois, en degrés Celsius. Cette valeur est calculée en prenant en compte à la fois les températures mesurées au-dessus des continents et celles mesurées au-dessus des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850. Cette donnée nous donne donc un aperçu de la température sur Terre dans sa globalité pendant un mois donné.
     \section{Modèles de prédiction envisagés}
 
     Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. Dans la mesure où il est impossible de tous les traiter, il a fallu faire des choix. Après recherches, les trois modèles qui seront abordés dans ce dossier sont les suivants :
@@ -174,7 +187,7 @@
         \item la saisonnalité hebdomadaire
         \item une liste de jours feriés importants fournie par l'utilisateur.
     \end{itemize}
-    \begin{figure}[h]
+    \begin{figure}[h!]
         \includegraphics[width=12cm]{facebook_prophet}
         \centering
         \caption{Les différentes composantes de Facebook Prophet}
@@ -191,7 +204,7 @@
     Par rapport aux RNN classiques, les LSTM ajoutent au réseau un composant supplémentaire qui garde une mémoire de long terme, par opposition à la propagation d'informations naturellement présente dans les RNN via la réutilisation des sorties précédentes en tant que valeurs d'entrée. Les LSTM comportent des composants logiques appelés "gates" qui déterminent quels éléments doivent être stockés dans cette mémoire de long terme.
 
     
-    \begin{figure}[h]
+    \begin{figure}[h!]
         \includegraphics[width=12cm]{RNNvsLSTM}
         \centering
         \caption{Représentation d'un LSTM}
@@ -214,7 +227,7 @@
         \item La RMSE est une métrique très courante qui a l'avantage de ne pas donner une importance disproportionnée à quelques valeurs extrêmes, contrairement à la MSE.
     \end{itemize}
 
-    \begin{figure}[h]
+    \begin{figure}[h!]
         \includegraphics[width=12cm]{mse}
         \centering
         \caption{Schématisation du concept de la MSE. La MSE correspond ici à la moyenne des surfaces de tous les carrés. Pour obtenir la RMSE il suffit de calculer la racine carrée de la MSE}
@@ -401,80 +414,5 @@
         \bibitem[4]{medium} Tum, Phylypo. Overview of Time Series Forecasting from Statistical to Recent ML Approaches. 2020. https://medium.com/@phylypo/overview-of-time-series-forecasting-from-statistical-to-recent-ml-approaches-c51a5dd4656a
         \bibitem[5]{meta} Sean J. Taylor, Ben Letham. Prophet Forecasting at Scale. 2017. https://research.facebook.com/blog/2017/2/prophet-forecasting-at-scale/
     \end{thebibliography}
-
-    \appendix
-    \newpage
-    \section*{Annexes \huge \centering}
-    \addcontentsline{toc}{section}{Annexes}
-    \section*{Exemples de code}
-    \label{sec:code}
-    \subsection*{Création et entraînement du modèle}
-    Chargement de nos données météorologiques dans une dataframe Pandas :
-    \begin{lstlisting}[language=Python]
-        import pandas as pd
-        # On charge le fichier csv qui se trouve dans un sous-dossier 'data'
-        data = pd.read_csv("./data/GlobalTemperatures.csv")
-        # On charge les températures moyennes (terre et océan confondus) dans une série de données Pandas,
-        # à partir de la 1300ème ligne (il n'y a aucune donnée avant cela).
-        # On réalise aussi une interpolation pour remplir automatiquement certaines valeurs manquantes
-        temperature = data["LandAndOceanAverageTemperature"].interpolate(limit_direction="backward")[1300:]
-        dates = pd.to_datetime(data["dt"])[1300:]
-    \end{lstlisting}
-
-    Stationarisation de notre série temporelle en utilisant le test augmenté de Dickey-Fuller :
-    \begin{lstlisting}[language=Python]
-        from statsmodels.tsa.stattools import adfuller
-    
-        def make_stationary(time_series):
-            """
-            Makes a time series stationary while the p-value computed using the ADF test is higher than 0.05
-            """
-            test_results = adfuller(time_series)
-            p_value = test_results[1]
-            if p_value > 0.05: # i.e. if the data is not stationary
-                # Differentiating until the p-value gets below 0.05
-                diff_data = time_series.copy()
-                for degree in range(1, 10):
-                    diff_data = diff_data.diff().dropna()
-                    if adfuller(diff_data)[1] <= 0.05:
-                        return diff_data, degree
-                
-                raise ValueError(f"Unable to stationarize data after {degree} times")
-            return time_series
-        
-        diff_temp, diff_degree = make_stationary(temperature)
-        print(f"Degrees of differentiating: {diff_degree}")
-    \end{lstlisting}
-
-    Entraînement du modèle et sélection des hyperparamètres :
-    \begin{lstlisting}[language=Python]
-        # Recherche des meilleurs paramètres pour notre ARIMA
-        # Comme nous avons déjà déterminé que notre degré de différenciation
-        # est de 1, nous pouvons le préciser à auto_arima pour gagner du temps
-        # d'exécution
-        from pmdarima import auto_arima
-        # On choisit une valeur de 12 pour la saisonnalité car nos données
-        # sont des moyennes mensuelles
-        best_model = auto_arima(train, seasonal=True, d=1, m=12, trace=True)
-        print(best_model)
-        \end{lstlisting}
-    
-    Réalisation de prédictions :
-    \begin{lstlisting}[language=Python]
-        from pmdarima.arima import ARIMA
-    
-        # On instancie notre modèle avec les hyperparamètres définis plus tôt
-        model = ARIMA(
-            order=(1, 1, 1),
-            seasonal_order=(2, 0, 1, 12)
-                    )
-        model.fit(train)
-    
-        predictions_count = len(test)
-        # On réalise des prédictions à comparer avec les valeurs de test
-        forecast, confidence_intervals = model.predict(predictions_count, return_conf_int=True) 
-        \end{lstlisting}
-    \subsection*{Développement de l'API REST}
-    AJOUTER UN SCRIPT QUI CRÉE L'API ET DIRE COMMENT LE LANCER ??
 
     \end{document}
