@@ -108,6 +108,24 @@
     \newpage
     \pagenumbering{arabic}
 
+    \section{A FAIRE}
+    \begin{itemize}
+        \item Insérer un planning de veille
+        \item Faire une liste d'outils de veille utilisés
+        \item Dire comment les résultats de la veille sont présentés
+        \item Ajouter page des références dans le sommaire
+        \item Ajouter des sources qui donnent les avantages et inconvénients des sources choisies
+        \item Ajouter des sources qui travaillent avec des données météorologiques
+        \item Mentionner que c'est un modèle SARIMA au début et non ARIMA
+        \item Trouver des études sur les temps de calcul des modèles et leur impact environnemental
+        \item Expliquer explicitement les limites et conditions de base de chaque modèle pour pouvoir les comparer de façon équitable
+        \item Montrer que le service est déployé et fonctionnel, screenshots à l'appui
+        \item Ajouter une section qui montre le fonctionnement de l'API
+        \item Expliquer les paramètres optimaux du modèle SARIMA et pourquoi ils sont adaptés au problème
+        \item Montrer le monitoring et prouver qu'il marche avec des screenshots
+        \item La section 4.5 pourrait être découpé en déploiement et puis fonctionnement du service avec des screenshots d'utilisation de l'API, expliquer explicitement la cinématique pour avoir une prédiction de météo, par ville ? qui et comment utiliser l'API ? 
+    \end{itemize}
+
     \section*{Introduction}
 
     Un grand organisme de prédiction météorologique nous contacte. 
@@ -134,17 +152,30 @@
     
     Nous nous intéresserons  plus spécifiquement à la \textbf{température mensuelle moyenne sur Terre} de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv (cf figure 1).
     
+
+
+    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature", qui recense la température moyenne sur Terre chaque mois, en degrés Celsius. Cette valeur est calculée en prenant en compte à la fois les températures mesurées au-dessus des continents et celles mesurées au-dessus des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850. Cette donnée nous donne donc un aperçu de la température sur Terre dans sa globalité pendant un mois donné.
     \begin{figure}[h!]
         \includegraphics[width=12cm]{dataset}
         \centering
-        \caption{Table GlobalTemperatures.csv}
+        \caption{Caractéristiques statistiques des données de la colonne "LandAndOceanAverageTemperature", issue de la table GlobalTemperatures.csv. Cette colonne contient les températures mensuelles moyennes mesurées au-dessus des continents et des océans}
         \centering
     \end{figure}
-
-    Les prédictions seront réalisées avec les données de la colonne "LandAndOceanAverageTemperature" (en surbrillance sur la figure 1), qui recense la température moyenne sur Terre chaque mois, en degrés Celsius. Cette valeur est calculée en prenant en compte à la fois les températures mesurées au-dessus des continents et celles mesurées au-dessus des océans. Nous disposons ainsi d'environ 2000 valeurs, dont les premières remontent à 1850. Cette donnée nous donne donc un aperçu de la température sur Terre dans sa globalité pendant un mois donné.
     \section{Modèles de prédiction envisagés}
 
-    Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. Dans la mesure où il est impossible de tous les traiter, il a fallu faire des choix. Après recherches, les trois modèles qui seront abordés dans ce dossier sont les suivants :
+    Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. On pourra notamment citer :
+    \begin{itemize}
+        \item ARIMA
+        \item les RNN (Recurrent Neural Networks)
+        \item les LSTM (Long-Short-Term Memory)
+        \item les CNN (Convolutional Neural Networks)
+        \item des modèles basés sur des Random Forests
+        \item des KNN
+        \item Facebook Prophet
+        \item ...
+    \end{itemize}
+    
+    Dans la mesure où il est impossible de tous les traiter, il a fallu faire des choix. Après recherches, les trois modèles qui seront abordés dans ce dossier sont les suivants :
     \begin{itemize}
         \item \textbf{ARIMA}
         \item \textbf{Facebook Prophet}
@@ -190,7 +221,7 @@
     \begin{figure}[h!]
         \includegraphics[width=12cm]{facebook_prophet}
         \centering
-        \caption{Les différentes composantes de Facebook Prophet}
+        \caption{Les différentes composantes de Facebook Prophet. Facebook Prophet fait des prédictions en additionnant quatre séries de données qui représentent la tendance, la saisonnalité annuelle, la saisonnalité hebdomadaire et les jours feriés.}
         \centering
     \end{figure}
 
@@ -201,13 +232,18 @@
     \subsection{Réseaux LSTM (Long Short-Term Memory)}
 
     Le terme "LSTM" désigne un type de réseau neuronal récurrent (RNN). Les LSTM ont été créés pour pallier aux problèmes de disparition (ou d'explosion, selon les cas) du gradient souvent rencontrés lorsque l'on utilise un réseau récurrent pour traiter de longues séquences de données.
-    Par rapport aux RNN classiques, les LSTM ajoutent au réseau un composant supplémentaire qui garde une mémoire de long terme, par opposition à la propagation d'informations naturellement présente dans les RNN via la réutilisation des sorties précédentes en tant que valeurs d'entrée. Les LSTM comportent des composants logiques appelés "gates" qui déterminent quels éléments doivent être stockés dans cette mémoire de long terme.
+    Par rapport aux RNN classiques, les LSTM ajoutent au réseau un composant supplémentaire qui garde une mémoire de long terme, par opposition à la propagation d'informations naturellement présente dans les RNN via la réutilisation des sorties précédentes en tant que valeurs d'entrée. Les LSTM comportent des composants logiques appelés "gates" qui déterminent quels éléments doivent être stockés dans cette mémoire de long terme. Ces \textit{gates} sont au nombre de trois :
+    \begin{itemize}
+        \item \textit{l'input gate}, qui contrôle les informations qui sont ajoutées à la cellule mémoire
+        \item \textit{la forget gate}, qui définit les informations qui sont supprimées de la cellule mémoire
+        \item \textit{l'output gate}, qui contrôle les informations qui sont récupérées depuis la celule mémoire.
+    \end{itemize}
 
     
     \begin{figure}[h!]
         \includegraphics[width=12cm]{RNNvsLSTM}
         \centering
-        \caption{Représentation d'un LSTM}
+        \caption{Comparaison entre les RNN et les LSTM. En plus de la mémoire déjà présente dans les RNN, les LSTM intègrent une cellule mémoire qui permet de conserver des informations sur le long terme, et donc de traiter de longues séries de données.}
         \centering
     \end{figure}
 
@@ -402,7 +438,7 @@
     Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi ARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
     Sur une note plus personnelle, le travail réalisé pour ce projet m'a permis de mieux comprendre le fonctionnement des modèles de séries temporelles ainsi que les caractéristiques propres à ce type de données.
 
-    Pour aller plus loin, n'hésitez pas à consulter les exemples de code joints aux annexes de ce dossier. L'intégralité du code source développé dans le cadre du dossier est quant à lui disponible sur \href{https://github.com/vinpap/predict_climate_change}{GitHub}.
+    Pour aller plus loin, n'hésitez pas à consulter le code source développé dans le cadre de ce dossier, disponible sur \href{https://github.com/vinpap/predict_climate_change}{GitHub}.
 
     \addcontentsline{toc}{section}{Conclusion}
 
