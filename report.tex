@@ -108,37 +108,26 @@
     \newpage
     \pagenumbering{arabic}
 
-    \section{A FAIRE}
-    \begin{itemize}
-        \item Insérer un planning de veille
-        \item Faire une liste d'outils de veille utilisés
-        \item Dire comment les résultats de la veille sont présentés
-        \item Ajouter page des références dans le sommaire
-        \item Ajouter des sources qui donnent les avantages et inconvénients des sources choisies
-        \item Ajouter des sources qui travaillent avec des données météorologiques
-        \item Mentionner que c'est un modèle SARIMA au début et non ARIMA
-        \item Trouver des études sur les temps de calcul des modèles et leur impact environnemental
-        \item Expliquer explicitement les limites et conditions de base de chaque modèle pour pouvoir les comparer de façon équitable
-        \item Montrer que le service est déployé et fonctionnel, screenshots à l'appui
-        \item Ajouter une section qui montre le fonctionnement de l'API
-        \item Expliquer les paramètres optimaux du modèle SARIMA et pourquoi ils sont adaptés au problème
-        \item Montrer le monitoring et prouver qu'il marche avec des screenshots
-        \item La section 4.5 pourrait être découpé en déploiement et puis fonctionnement du service avec des screenshots d'utilisation de l'API, expliquer explicitement la cinématique pour avoir une prédiction de météo, par ville ? qui et comment utiliser l'API ? 
-    \end{itemize}
-
     \section*{Introduction}
 
     Un grand organisme de prédiction météorologique nous contacte. 
-    Afin de prédire au mieux l'évolution du climat à échelle mondiale et dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne en cherchant la meilleure précision possible. Plus spécifiquement, ils nous demandent un modèle capable de prédire l'évolution des températures moyennes sur Terre sur de longues périodes. Ils insistent notamment sur les points suivants :
-    \begin{itemize}
-        \item l'organisation disposant de serveurs ultra-performants, la puissance de calcul n'est pas un problème.
-        \item afin d'éviter les erreurs de prédiction et pour que le public continue à faire confiance aux prédictions météorologiques, le modèle proposé devra être celui qui offre la meilleure précision.
-        \item des instructions expliquant la mise en place et l'utilisation du modèle devront être fournies.
-    \end{itemize}
+    Afin de prédire au mieux l'évolution du climat à échelle mondiale et dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne en cherchant la meilleure précision possible. Plus spécifiquement, ils nous demandent un modèle capable de prédire l'évolution d'une série de températures sur de longues périodes. 
     
     Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}.
 
     \addcontentsline{toc}{section}{Introduction}
+
+    \section{Contraintes techniques et objectifs}
+
+    L'objectif que nous donne notre client est de lui fournir un modèle de prédiction de températures basé sur une \textbf{série de températures mensuelles moyennes}. Bien que notre client souhaite utiliser ce modèle pour prédire des températures moyennes à l'échelle du monde entier, il n'exclut pas de s'en servir pour prédire des températures locales à l'avenir (par exemple à l'échelle d'une ville ou d'une région). Par conséquent, \textbf{notre client souhaite pouvoir réentraîner lui-même le modèle fourni pour l'utiliser avec d'autres données}.
+
+    Par ailleurs, notre client nous impose les contraintes suivantes :
+    \begin{itemize}
+        \item le modèle doit être utilisable via une API. Les techniciens de notre client doivent pouvoir utiliser cette API pour réaliser des prédictions, évaluer les performances du modèle et le réentraîner
+        \item notre client dispose de serveurs adaptés à la mise en place de modèles d'intelligence artificielle exigeants en ressource. Par conséquent, le choix du modèle d'intelligence artificielle à utiliser ne devrait pas exclure les modèles nécessitant beaucoup de puissance de calcul. En revanche, notre client insiste sur le fait que le modèle retenu doit être \textbf{celui qui offre les prédictions les plus précises} afin d'éviter les erreurs de prévision et pour que le public continue à faire confiance aux organismes météorologiques.
+        \item des instructions expliquant comment installer et utiliser le modèle sur les serveurs de notre client devront être fournies.
+    \end{itemize}
+
     \section{Jeu de données}
     
     Afin de faire la démonstration du modèle retenu, nous utiliserons \href{https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data}{ce dataset}. Il rencense les températures mensuelles moyennes sur Terre depuis le XVIIIè siècle, à échelle mondiale et en des points du globe spécifiques. Ce jeu de données est issu de l'aggrégation d'une grande quantité de données historiques réalisée par l'ONG \href{http://berkeleyearth.org/about/}{Berkeley Earth}. Berkeley Earth est associé au Lawrence Berkeley National Laboratory, un laboratoire universitaire de Californie.
@@ -161,6 +150,35 @@
         \caption{Caractéristiques statistiques des données de la colonne "LandAndOceanAverageTemperature", issue de la table GlobalTemperatures.csv. Cette colonne contient les températures mensuelles moyennes mesurées au-dessus des continents et des océans}
         \centering
     \end{figure}
+
+    \section{Méthodologie de la veille}
+    Cette section présente la façon dont a été réalisée la veille technologique qui nous a permis de sélectionner le modèle d'intelligence artificielle le plus adapté aux besoins de notre client.
+
+    \subsection{Planification}
+
+    La veille a été réalisée sur une période s'étalant sur \textbf{6 semaines}, à raison \textbf{d'une demi-journée} (3 heures) par semaine.
+
+    \subsection{Type de ressources recherché}
+    Afin de baser le choix de notre modèle sur des informations fiables, seuls deux types de ressources sont utilisés dans le cadre de cette veille :
+    \begin{itemize}
+        \item \textbf{les publications universitaires}
+        \item les articles et études publiés par des professionnels du domaine de la donnée. Quelques vérifications sont alors réalisées pour \textbf{s'assurer de la fiabilité de la source}. La première d'entre elles consiste à réaliser une recherche sur LinkedIn et Google pour s'assurer que l'auteur est bien un professionnel qui travaille dans le domaine de l'intelligence artificielle. La deuxième vérification réalisée est de faire des recherches sur l'entreprise ou l'organisation à laquelle est affilié l'auteur pour s'assurer qu'il s'agit d'un organisme qui réalise bien des travaux en rapport avec l'intelligence artificielle. Enfin, on vérifiera également que le site où est publié l'article est fiable en se méfiant notamment des sites de publication tels que Medium, où les articles ne sont pas vérifiés avant leur publication.
+    \end{itemize}
+    Plusieurs moyens ont été employés pour trouver des sources pertinentes qui répondent à ces critères :
+    \begin{itemize}
+        \item \textbf{\href{https://scholar.google.com/}{Google Scholar}} nous a permis de trouver facilement des publications scientifiques pertinentes par rapport à nos besoins
+        \item Des recherches sur Google ont aussi été réalisées pour trouver des sources non-universitaires (publications d'entreprise, blogs de professionnels)
+        \item De façon plus informelle, des contacts universitaires travaillant dans le domaine de l'intelligence artificielle ont aussi été sollicités pour demander des conseils ou obtenir l'accès à des publications nécessitant un abonnement.
+    \end{itemize}
+    \subsection{Présentation de la veille}
+    La veille sera présentée comme ceci :
+    \begin{enumerate}
+        \item Tout d'abord, les modèles considérés dans le cadre de cette veille ainsi que les raisons de leur choix seront présentés
+        \item Nous définirons ensuite la métrique de performance utilisée pour évaluer les différents modèles 
+        \item Par la suite, les sources utilisées pour réaliser la veille seront présentées. Une liste complète des sources est disponible dans la section \textbf{\hyperref[sec:references]{Références}} à la fin de ce dossier
+        \item Nous étudierons ensuite les performances obtenues pour chacun des modèles étudiés dans les sources précédemment présentées. Dans un souci de clarté, ces valeurs seront exposées dans des tableaux qui nous permettront de comparer facilement les différents modèles. Pour chaque source, nous résumerons en quelques phrases les conclusions que l'on peut tirer de ces valeurs. 
+        \item Enfin, nous concluerons en choisissant le modèle le plus adapté aux besoins de notre client au vu des résultats de notre veille.
+    \end{enumerate}
     \section{Modèles de prédiction envisagés}
 
     Il existe de nombreux modèles d'IA qui permettent de réaliser des prédictions à partir de séries temporelles. On pourra notamment citer :
@@ -182,7 +200,7 @@
         \item \textbf{Réseaux LSTM (Long Short-Term Memory)}
     \end{itemize} 
     
-    Ces modèles ont été spécifiquement choisis car ils sont très utilisés et qu'il existe donc beaucoup de ressources à leur sujet. Il nous sera ainsi possible de nous baser sur la littérature technique et scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est exposé dans la section suivante.
+    Ces modèles ont été spécifiquement choisis car ils sont très utilisés et qu'il existe donc beaucoup de ressources à leur sujet, y compris en lien avec la prévision de données météorologiques\cite{chen, alsharif, karevan}. Il nous sera ainsi possible de nous baser sur la littérature technique et scientifique existante pour choisir, parmi ces modèles, le plus adapté à nos besoins. Le fonctionnement de chaque modèle est exposé dans la section suivante.
 
     \subsection{ARIMA (Autoregressive Integrated Moving Average)}
 
@@ -206,7 +224,13 @@
         \textbf{Remarque importante: }Seules certaines séries temporelles peuvent être stationnarisées grâce à la différenciation, il s'agit de celles qui ont une \textbf{racine unitaire}. Il est donc important de réaliser des analyses préliminaires sur nos données pour savoir si la différenciation est adaptée à notre cas de figure avant d'appliquer le modèle ARIMA.
 
     \end{itemize}
-    En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}.
+    En plus des paramètres $p$, $d$ et $q$ présentés ci-dessus, le modèle ARIMA peut aussi avoir des paramètres $(P, Q, D)m$ qui décrivent la saisonnalité des données, s'il y en a une. On parle alors de modèle \textbf{SARIMA}. Nous reviendrons plus en détail sur ce point dans le bilan de cette veille.
+
+    \underline{\textbf{Contraintes et prérequis de ce modèle}} : 
+    \begin{itemize}
+        \item Pour fonctionner, ARIMA doit préalablement être entraîné sur une série de données \textbf{ininterrompue}. Une étape de traitement des données est donc nécessaire s'il manque des valeurs dans notre jeu de données (on pourra par exemple remplacer les valeurs manquantes par la valeur précédente dans la série de données).
+        \item Comme nous l'avons vu, ARIMA ne fonctionne pas avec toutes les séries temporelles, uniquement avec celles qui peuvent être stationnarisées par différenciation.
+    \end{itemize}
     
     \subsection{Facebook Prophet}
 
@@ -228,6 +252,12 @@
     Chacune de ces composantes est gérée par un modèle distinct. La saisonnalité annuelle, par exemple, est modélisée à l'aide de séries de Fourier. Ces quatre modèles sont ensuite combinés additivement.
     
     Facebook Prophet se veut simple à mettre en place et permet de réaliser des prédictions très rapidement. Ce modèle était à l'origine développé pour être utilisé avec les données commerciales auxquelles sont souvent confrontés les data scientists de Meta, ce qui le rend plus adapté à certains types de données spécifiques (données financières ou commerciales par exemple). 
+
+    \underline{\textbf{Contraintes et prérequis de ce modèle}} : 
+    \begin{itemize}
+        \item Comme ARIMA, Facebook Prophet doit être entraîné avec une série de données ininterrompue
+        \item Facebook Prophet est conçu pour être utilisé avec des données qui comportent nécessairement une saisonnalité.
+    \end{itemize}
     
     \subsection{Réseaux LSTM (Long Short-Term Memory)}
 
@@ -248,6 +278,12 @@
     \end{figure}
 
     Loin d'être propres aux séries temporelles, les LSTM sont utilisés pour répondre à de nombreux problèmes tels que la traduction automatique, la génération de texte ou encore l'analyse de vidéos.
+
+    \underline{\textbf{Contraintes et prérequis de ce modèle}} : 
+    \begin{itemize}
+        \item Comme pour les modèles précédents, il ne doit pas y avoir de valeurs manquantes dans la série de données
+        \item Il est d'usage de stationnariser et normaliser notre série de données avant d'entraîner le modèle.
+    \end{itemize}
 
     \section{Comparaison des modèles}
 
@@ -270,7 +306,7 @@
         \centering
     \end{figure}
 
-    \subsection{Présentation des sources}
+    \subsection{Sources des comparaisons}
 
     Les comparaisons ci-dessous s'appuient sur les travaux publiés dans des publications scientifiques et des sites web spécialisés dont la liste complète est disponible dans la bibliographie. Parmi ceux-là, on pourra notamment citer :
     \begin{itemize}
@@ -278,6 +314,8 @@
         \item Une comparaison d'ARIMA, de Facebook Prophet et de modèles combinant le LSTM à des CNN, par Lorenzo Menculini et al.\cite{menculini}. Ces modèles sont appliqués à la prédiction de prix de vente de produits alimentaires
         \item Un article du fournisseur de soutions de MLOps Neptune.ai\cite{neptune} qui compare les performances de ces modèles sur des données boursières.
     \end{itemize}
+
+    On pourra remarquer que ces sources ne traitent pas de données météorologiques. Cela s'explique par la difficulté de trouver des sources qui couvrent précisément les trois modèles qui nous intéressent, avec le type de données qui nous intéresse. Ici, notre approche sera donc d'étudier les performances des trois modèles avec plusieurs types de données différents, puis de choisir le modèle le plus performant de manière générale. Le modèle retenu sera ainsi celui qui a le plus de chances d'être performant avec nos données.
 
     \subsection{Conclusions des sources choisies}
     Bien que toutes les sources n'arrivent pas à un consensus évident, on peut tout de même en dégager plusieurs conclusions.
@@ -291,7 +329,7 @@
         \begin{center}
             \begin{tabular}{ |c|c| }
                 \hline
-                Modèle & RMSE \\
+                 & RMSE \\
                 \hline
                 ARIMA & 5.5 \\ 
                 \hline
@@ -309,14 +347,14 @@
     \begin{itemize}
         \item  Facebook Prophet produit des prédictions moins précises que les LSTM et ARIMA. Cependant, le modèle s'avère très simple et rapide d'utilisation, sans avoir besoin de beaucoup de nettoyage préalable sur les données.
         \item Les LSTM ont les meilleurs performances des trois modèles testés, mais aussi un temps d'entraînement largement plus long.
-        \item ARIMA a une précision supérieure à Facebook Prophet et inférieure au LSTM, mais un temps d'entraînement très court comparé à ces derniers.
+        \item En termes de temps d'entraînement, le modèle le plus rapide à entraîner est Facebook Prophet, suivi d'ARIMA puis des LSTM.
     \end{itemize}
     Voici les performances calculées pour chaque modèle dans le cadre de cette étude. On remarquera que les modèles ont été testés sur trois produits différents.
     \begin{table}[h!]
         \begin{center}
             \begin{tabular}{ |c| c| c| c| }
                 \hline
-                Produit & 1 & 2 & 3 \\
+                 & 1 & 2 & 3 \\
                 \hline
                 ARIMA & 0.0758 & 0.173 & 0.215 \\ 
                 \hline
@@ -325,7 +363,7 @@
                 Facebook Prophet & 0.0812 & 0.220 & 0.350 \\
                 \hline
             \end{tabular}
-            \caption{RMSE obtenue avec chaque modèle (métrique calculée sur les données de test après finetuning) - Lorenzo Menculini et al.}
+            \caption{RMSE obtenue avec chaque modèle (métrique calculée sur les données de test après finetuning. Les différentes colonnes correspondent aux jeux de données utilisés, ici des prix de produits alimentaires) - Lorenzo Menculini et al.}
             \label{table:1}
         \end{center}
     \end{table}
@@ -341,7 +379,7 @@
         \begin{center}
             \begin{tabular}{ |c|c| }
                 \hline
-                Modèle & RMSE \\
+                 & RMSE \\
                 \hline
                 ARIMA & 224.324 \\ 
                 \hline
@@ -355,24 +393,41 @@
         \end{center}
     \end{table}
 
+    \subsection{Impact environnemental des différents modèles}
+    Bien que notre client souhaite que nous sélectionnions le modèle qui présente les meilleures performances, un autre aspect entre en compte dans le choix du modèle le plus adapté à ses besoins : \textbf{l'impact environnemental des différents modèles}. 
+
+    L'impact environnemental des modèles d'intelligence artificielle a souvent été pointé du doigt ces dernières années, que ce soit dans la presse générale à propos de services comme ChatGPT, ou dans des publications scientifiques\cite{shaji}. Dans un souci d'éco-responsabilité, il est donc important d'évaluer l'impact environnemental de chaque modèle. Cet impact environnemental peut se mesurer en temps de calcul : plus un modèle nécessite un temps d'exécution plus long, plus il consomme d'énergie. On préférera donc si possible choisir un modèle dont les temps d'entraînement et d'inférence sont faibles.
+
+    Bien qu'il soit difficile de trouver des sources qui comparent spécifiquement les temps d'entraînement et d'inférence des modèles que nous étudions, certaines sources nous donnent des indices sur l'impact environnemental de chaque modèle :
+    \begin{itemize}
+        \item Comme évoqué plus haut, Menculini et al.\cite{menculini} affirment que le modèle le plus rapide à entraîner dans leur étude était Facebook Prophet, suivi d'ARIMA puis des LSTM
+        \item Les modèles de deep learning (LSTM compris) sont souvent définis comme exigeants en ce qui concerne les ressources et le temps de calcul nécessaires pour leur entraînement\cite{thompson}.
+    \end{itemize}
+
+
+
     \subsection{Bilan et choix du modèle}
     À l'aide des informations ci-dessus, nous pouvons maintenant choisir en toute connaissance de cause le meilleur modèle pour notre problématique.
 
     Comme nous l'avons dit en début de dossier, les performances sont le critère le plus important dans notre choix, avant la facilité d'utilisation et la rapidité de mise en place. Facebook Prophet paraît donc inadapté à notre problème, au vu de ses performances inférieures à celles des autres modèles.
 
-    En termes de performances, ARIMA et les LSTM paraissent sur un pied d'égalité. Cependant, ARIMA semble être un meilleur choix. En effet, le LSTM a besoin de beaucoup de données pour produire de bons résultats. Or, notre dataset contient une seule série de 2000 échantillons, avec une seule feature. Cela risque de ne pas être suffisant pour obtenir des prédictions fiables. Notre choix se portera donc sur un modèle ARIMA (plus précisément sur un modèle \textbf{SARIMA}, puisque nos données comportent une saisonnalité).
-    
-    \section{Mise en place d'ARIMA}
+    En termes de performances, ARIMA et les LSTM paraissent sur un pied d'égalité. Cependant, ARIMA semble être un meilleur choix. En effet, le LSTM a besoin de beaucoup de données pour produire de bons résultats. Or, notre dataset contient une seule série de 2000 échantillons, avec une seule feature. Cela risque de ne pas être suffisant pour obtenir des prédictions fiables. De plus, nous avons vu dans la section précédente qu'ARIMA a un temps d'entraînement moindre comparé à un LSTM. Or, l'une des contraintes du projet est que le client puisse lui-même réentraîner le modèle de prédiction de températures. Le temps d'entraînement a donc une importance particulière si nous souhaitons réduire l'impact environnemental de notre service d'intelligence artificielle. Notre choix se portera donc sur le modèle ARIMA.
 
-    Cette section couvre la mise en place d'un modèle ARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code relatif à cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
+    On notera cependant que nos données comportent une saisonnalité dans la mesure où elles représentent des moyennes mensuelles. Nos données suivent donc un cycle de 12 mois. Afin de bien refléter cela, nous déciderons d'implémenter la version saisonnière d'ARIMA que nous avons évoquée lors de la présentation des modèles : le modèle \textbf{SARIMA}, pour \textit{Seasonal ARIMA}.
+
+
+    
+    \section{Mise en place de SARIMA}
+
+    Cette section couvre la mise en place d'un modèle SARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code relatif à cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
 
     \subsection{Chargement des données et analyses préliminaires}
 
-    La première étape consiste à charger nos données. Pour cela, nous utiliserons \textbf{pandas} pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. 
+    La première étape consiste à charger nos données. Pour cela, nous utiliserons \textbf{pandas} pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. [ET POUR LES VALEURS MANQUANTES ?]
 
     Comme nous l'avons fait remarquer dans la section qui traite du modèle ARIMA, la différenciation réalisée par le modèle ne permet pas de stationariser tous les types de séries temporelles. Pour nous assurer que la différenciation est bien adaptée à notre cas, nous allons réaliser une différenciation sur nos données, puis tester leur stationarité.
     La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationnaires ou non. Si notre p-value est inférieure à un seuil fixé à 0.05, nos données sont stationaires. Sinon, elles ne le sont pas.
-    Dans notre cas, réaliser une seule différenciation nous a permis de stationnariser nos données (voir la figure 5). Le modèle ARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
+    Dans notre cas, réaliser une seule différenciation nous a permis de stationnariser nos données (voir la figure 5). Le modèle SARIMA est donc bien applicable à nos données. Par ailleurs, nous avons appris que le paramètre d de notre modèle doit prendre la valeur 1.
     \begin{figure}[h]
         \includegraphics[width=12cm]{differenciating}
         \centering
@@ -435,7 +490,7 @@
 
     \newpage
     \section*{Conclusion}
-    Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi ARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
+    Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi SARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
     Sur une note plus personnelle, le travail réalisé pour ce projet m'a permis de mieux comprendre le fonctionnement des modèles de séries temporelles ainsi que les caractéristiques propres à ce type de données.
 
     Pour aller plus loin, n'hésitez pas à consulter le code source développé dans le cadre de ce dossier, disponible sur \href{https://github.com/vinpap/predict_climate_change}{GitHub}.
@@ -449,6 +504,13 @@
         \bibitem[3]{neptune} Kutzkov, Konstantin. ARIMA vs Prophet vs LSTM for Time Series Prediction. 2023. https://neptune.ai/blog/arima-vs-prophet-vs-lstm
         \bibitem[4]{medium} Tum, Phylypo. Overview of Time Series Forecasting from Statistical to Recent ML Approaches. 2020. https://medium.com/@phylypo/overview-of-time-series-forecasting-from-statistical-to-recent-ml-approaches-c51a5dd4656a
         \bibitem[5]{meta} Sean J. Taylor, Ben Letham. Prophet Forecasting at Scale. 2017. https://research.facebook.com/blog/2017/2/prophet-forecasting-at-scale/
+        \bibitem[6]{chen} Peng, Chen; Aichen, Niu; Duanyang, Liu; Wei, Jiang; Bin, Ma. Time Series Forecasting of Temperature using SARIMA: An Example from Nanjing. 2018. IOP Conf. Ser.: Mater. Sci. Eng. 394 052024
+        \bibitem[7]{alsharif} Alsharif, M.H.; Younes, M.K.; Kim, J. Time Series ARIMA Model for Prediction of Daily and Monthly Average Global Solar Radiation: The Case Study of Seoul, South Korea. Symmetry 2019, 11, 240.
+        \bibitem[8]{karevan} Karevan, Zahra; Suykens, Johan A.K. Transductive LSTM for time-series prediction: Am application to weather forecasting. 2020. Neural Networks, Volume 125, Pages 1-9, ISSN 0893-6080.
+        \bibitem[9]{shaji} A. Shaji George, A. S. Hovan George, A. S. Gabrio Martin. The Environmental Impact of AI: A Case Study of Water Consumption by Chat GPT. 2023. Partners Universal International Innovation Journal 1 (2):97-104. https://doi.org/10.5281/zenodo.7855594.
+        \bibitem[10]{thompson} Thompson, Neil C.; Kristjan Greenewald; Keeheon Lee; Gabriel F. Manso. The Computational Limits of Deep Learning. 2020. arXiv.Org. July 10, 2020. https://arxiv.org/abs/2007.05558.
     \end{thebibliography}
+    \addcontentsline{toc}{section}{Références}
+    \label{sec:references}
 
     \end{document}
