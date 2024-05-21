@@ -57,7 +57,9 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+      - name: Create secret values in environment 
+        run: |
+          export API_TOKEN=${{ secrets.SECRET_API_TOKEN }}
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
