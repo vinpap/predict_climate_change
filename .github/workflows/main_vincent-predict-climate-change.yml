@@ -10,6 +10,9 @@ on:
       - main
   workflow_dispatch:
 
+env: 
+  API_TOKEN: ${{ secrets.SECRET_API_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -64,5 +67,4 @@ jobs:
           app-name: 'vincent-predict-climate-change'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7F42A75EA75C4D6D8364FB6948C7CFF9 }}
-        env: 
-          API_TOKEN: ${{ secrets.SECRET_API_TOKEN }}
+        
