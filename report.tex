@@ -419,11 +419,11 @@
     
     \section{Mise en place de SARIMA}
 
-    Cette section couvre la mise en place d'un modèle SARIMA, de l'entraînement du modèle à sa mise à disposition sur une API. Le code relatif à cette partie du rapport est disponible dans les \hyperref[sec:code]{annexes}.
+    Cette section couvre la mise en place d'un modèle SARIMA, de la sélection des hyperparamètres du modèle à sa mise à disposition sur une API.
 
     \subsection{Chargement des données et analyses préliminaires}
 
-    La première étape consiste à charger nos données. Pour cela, nous utiliserons \textbf{pandas} pour lire le CSV qui contient nos données et enregistrer celles qui nous intéressent dans une dataframe. [ET POUR LES VALEURS MANQUANTES ?]
+    La première étape consiste à charger les données que nous utiliserons pour définir les hyperparamètres avec lesquels entraîner notre modèle. Pour cela, nous utiliserons \textbf{pandas} pour lire le CSV qui contient le jeu de données que nous avons présenté au début de ce dossier. Les éventuelles données manquantes dans notre série de données sont remplacées par la moyenne de la valeur précédente et la valeur suivante.
 
     Comme nous l'avons fait remarquer dans la section qui traite du modèle ARIMA, la différenciation réalisée par le modèle ne permet pas de stationariser tous les types de séries temporelles. Pour nous assurer que la différenciation est bien adaptée à notre cas, nous allons réaliser une différenciation sur nos données, puis tester leur stationarité.
     La stationarité d'une série de données peut être mesurée à l'aide du \textbf{test augmenté de Dickey-Fuller}, ou test ADF. Ce test génère une p-value qui nous servira à déterminer si nos données sont stationnaires ou non. Si notre p-value est inférieure à un seuil fixé à 0.05, nos données sont stationaires. Sinon, elles ne le sont pas.
@@ -436,10 +436,9 @@
     \end{figure}
     \subsection{Entraînement du modèle et sélection des hyperparamètres}
 
-    Nous utiliserons l'implémentation de modèle SARIMA proposée par le module \href{https://pypi.org/project/pmdarima/}{pmdarima}. Ce module propose la fonction pmdarima.arima.auto\_arima, qui recherche automatiquement les meilleurs paramètres pour notre modèle.
-    L'exécution de notre code nous donne la sortie suivante : \textbf{"Best model:  ARIMA(1,1,1)(2,0,1)[12] intercept"}. Les paramètres indiqués sont ceux qui offrent les meilleures performances avec notre jeu de données.
+    Nous utiliserons l'implémentation de modèle SARIMA proposée par le module \href{https://pypi.org/project/pmdarima/}{pmdarima}. Ce module propose la fonction pmdarima.arima.auto\_arima, qui recherche automatiquement les meilleurs paramètres pour notre modèle. Cette fonction cherche à minimiser \textbf{l'AIC}, ou \textit{Akaike Information Critera} de notre modèle, et conserve donc les hyperparamètres qui produisent l'AIC le plus bas. L'AIC est une métrique qui évalue la qualité d'un modèle en prenant en compte son score d'erreur et sa complexité en nombre de paramètres. L'objectif est ici de trouver un modèle qui réalise des prédictions précises tout en limitant les valeurs des hyperparamètres.
 
-    \subsection{Prédictions}
+    L'exécution de notre code nous donne la sortie suivante : \textbf{"Best model:  ARIMA(1,1,1)(2,0,1)[12] intercept"}. Les hyperparamètres indiqués sont donc ceux que nous utiliserons lors de l'entraînement de notre modèle.
 
     Nous pouvons maintenant utiliser notre modèle pour réaliser des prédictions. La figure 6 présente les prédictions obtenues par notre modèle en les confrontant avec les valeurs réelles issues de notre jeu de données de test. La lecture de ce graphique nous laisse penser que le modèle SARIMA a bien réussi à prédire les évolutions de notre jeu de données.
 
@@ -450,7 +449,33 @@
         \centering
     \end{figure}
 
-    \subsection{Monitoring du modèle}
+    \subsection{Déploiement}
+
+    Il est temps de déployer le modèle sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes. Cette API sera ensuite déployée sur \textbf{Azure Web App} grâce aux fonctions d'intégration continue de GitHub. Ainsi, l'API sera automatiquement redéployée à chaque fois que du nouveau code est poussé sur la branche principale du dépôt GitHub du projet.
+
+    Dans notre cas, nous définirons les endpoints suivants :
+    \begin{itemize}
+        \item \textbf{predict} : permet de prédire toutes les températures moyennes mensuelles jusqu'à une date donnée par l'utilisateur
+        \item \textbf{train} : entraîne le modèle SARIMA. Pour cela, l'utilisateur envoie à l'API une liste de températures mensuelles ainsi que la date qui marque le début de la série de températures
+        \item \textbf{test} : prédit les températures mensuelles moyennes envoyées par l'utilisateur, puis compare ces prédictions aux températures relevées aux mêmes dates et calcule la RMSE. L'utilisateur doit joindre à cette requête la liste de températures à utiliser pour réaliser le test et la date qui marque le début de cette série.
+    \end{itemize}
+
+    Un point crucial est qu'il est nécessaire de \textbf{sécuriser notre API}. En l'état, celle-ci souffre d'un défaut majeur : n'importe qui peut effectuer des requêtes à notre API. Imaginons que quelqu'un sans aucun rapport avec l'organisation de météorologie que nous servons réentraîne le modèle avec ses données, ou sature les capacités de la machine qui héberge notre API en réalisant de nombreuses requêtes simultanément : ce serait un désastre !
+
+    Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées. On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Ce token sera enregistré en tant que variable d'environnement sur l'hôte qui exécute le code de notre API sur Azure. Sa valeur est stockée dans un secret GitHub qui est automatiquement transmis à Azure au moment du déploiement.
+
+    \begin{figure}[h]
+        \includegraphics[width=8cm]{gh_action}
+        \centering
+        \caption{La valeur du token secret de l'API est automatiquement récupérée depuis les secrets GitHub au moment du déploiement}
+        \centering
+    \end{figure}
+
+    Une fois le déploiement effectué, l'API est disponible à l'adresse fournie par Azure (https://vincent-predict-climate-change.azurewebsites.net/ dans notre cas).
+
+    [INSÉRER UN SCREENSHOT DE L'UTILISATION DE L'API (à /docs).]
+
+    \subsection{Monitorage du modèle}
     
     Une fois notre modèle entraîné, il est important de mettre des mécanismes en place pour s'assurer que ses prédictions restent suffisamment précises sur la durée. En effet, un problème courant lorsque l'on travaille avec des modèles de séries temporelles est le \textbf{data drift}. Le data drift désigne le phénomène qui arrive lorsque la relation entre nos valeurs prédites $Y$ et nos features $X$ change au fil du temps. Le data drift est particulièrement courant lorsque l'on travaille avec des données non stationnaires, comme dans notre cas.
     \begin{figure}[h]
@@ -459,34 +484,34 @@
         \caption{Illustration du phénomène de "data drift" : il faut surveiller les performances de notre modèle pour le réentraîner lorsque celles-ce se dégradent trop}
         \centering
     \end{figure}
-    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe au-dessus d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes. On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
+    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe au-dessus d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes.
+    
+    [SECTION CI-DESSOUS À RÉÉCRIRE, AJOUTER SCREENSHOT(S) DU MONITORING QUI TOURNE]
+    [DE LÀ]
+    
+    On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
     
     Pour fonctionner ce script aura besoin d'accéder aux derniers relevés de température, qui pourront être stockés dans une base de données. Le script lui-même pourra être déployé sur un service tel qu'Azure Function, qui s'occupera de l'exécuter à intervalles réguliers.
 
+    [À DE LÀ]
 
-    \subsection{Déploiement}
-
-    Il est temps de déployer le modèle sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes.
-    Dans notre cas, nous aurons besoin de définir les endpoints suivants :
-    \begin{itemize}
-        \item \textbf{predict} : permet de prédire toutes les températures moyennes mensuelles comprises dans une plage de dates
-        \item \textbf{train} : entraîne le modèle SARIMA
-        \item \textbf{test} : prédit les températures mensuelles moyennes dans une plage de dates, puis compare ces prédictions aux températures relevées aux mêmes dates et calcule la RMSE.
-    \end{itemize}
-
-    Un point crucial est qu'il est nécessaire de \textbf{sécuriser notre API}. En l'état, celle-ci souffre d'un défaut majeur : n'importe qui peut effectuer des requêtes à notre API. Imaginons que quelqu'un sans aucun rapport avec l'organisation de météorologie que nous servons réentraîne le modèle avec ses données, ou sature les capacités de la machine qui héberge notre API en réalisant de nombreuses requêtes simultanément : ce serait un désastre !
-
-    Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées ! On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Il serait envisageable de conserver nos valeurs secrètes dans les variables d'environnement de la machine qui héberge notre API, ou sur un service dédié tel qu'Azure Vault. 
-
-
-    La figure 8 récapitule le fonctionnement de notre API et ses interactions avec les autres composants.
-
+    La figure 8 récapitule le fonctionnement de notre API et ses interactions avec les autres composants, et notamment le script de monitorage.
     \begin{figure}[h]
         \includegraphics[width=12cm]{schema_API_E2}
         \centering
         \caption{Fonctionnement de l'API sur laquelle est déployée notre modèle SARIMA}
         \centering
     \end{figure}
+
+    \section{Documentation}
+
+    [Parler de la doc (à rédiger dans le readme). On la résume quand même brièvement en-dessous]
+    \subsection{Déploiement du modèle}
+    \subsection{Utilisation du modèle par les météorologues}
+    \subsection{Réentraîner le modèle}
+    \subsection{Gestion de la sécurité}
+
+
 
     \newpage
     \section*{Conclusion}
