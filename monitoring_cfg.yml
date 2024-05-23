@@ -1,0 +1,12 @@
+API_ENDPOINT: https://vincent-predict-climate-change.azurewebsites.net/
+DATA:
+  CSV_PATH: ./data/temperatures.csv
+  DB_NAME: your database name
+  DB_PORT: '5432'
+  DB_URL: database_exeample.postgres.database.azure.com
+  DB_USER: vincent
+  LOAD_FROM_CSV: true
+EMAIL_SETTINGS:
+  SMTP_SERVER: smtp.gmail.com
+  EMAIL_RECIPIENT: papelardvincent@gmail.com
+RMSE_THRESHOLD: 0.3589540133022646
