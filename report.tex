@@ -464,16 +464,14 @@
 
     Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées. On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Ce token sera enregistré en tant que variable d'environnement sur l'hôte qui exécute le code de notre API sur Azure. Sa valeur est stockée dans un secret GitHub qui est automatiquement transmis à Azure au moment du déploiement.
 
+    Une fois le déploiement effectué, l'API est disponible à l'adresse fournie par Azure (https://vincent-predict-climate-change.azurewebsites.net/ dans notre cas). La figure ci-dessous montre à quoi ressemble l'API une fois déployée sur Azure.
+
     \begin{figure}[h]
-        \includegraphics[width=8cm]{gh_action}
+        \includegraphics[width=12cm]{api_azure}
         \centering
-        \caption{La valeur du token secret de l'API est automatiquement récupérée depuis les secrets GitHub au moment du déploiement}
+        \caption{FastAPI définit automatiquement un endpoint /docs qui nous permet d'envoyer des requêtes à notre API directement depuis le navigateur. Cette figure montre un exemple de requête POST envoyée au endpoint /train}
         \centering
     \end{figure}
-
-    Une fois le déploiement effectué, l'API est disponible à l'adresse fournie par Azure (https://vincent-predict-climate-change.azurewebsites.net/ dans notre cas).
-
-    [INSÉRER UN SCREENSHOT DE L'UTILISATION DE L'API (à /docs).]
 
     \subsection{Monitorage du modèle}
     
@@ -484,16 +482,37 @@
         \caption{Illustration du phénomène de "data drift" : il faut surveiller les performances de notre modèle pour le réentraîner lorsque celles-ce se dégradent trop}
         \centering
     \end{figure}
-    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe au-dessus d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes.
-    
-    [SECTION CI-DESSOUS À RÉÉCRIRE, AJOUTER SCREENSHOT(S) DU MONITORING QUI TOURNE]
-    [DE LÀ]
-    
-    On choisira ici d'utiliser comme seuil la RMSE de notre modèle après son premier entraînement. Un script dédié au monitoring de notre modèle sera ainsi exécuté automatiquement à intervalles réguliers. Ce script, qui aura accès aux températures mensuelles moyennes relevées récemment, réalisera des tests de notre modèle en confrontant les valeurs prédites aux relevés de température. Si la RMSE calculée est supérieure à notre seuil d'erreur défini, le script lance alors un réentraînement du modèle, en mettant à jour son jeu d'entraînement avec les derniers relevés.
-    
-    Pour fonctionner ce script aura besoin d'accéder aux derniers relevés de température, qui pourront être stockés dans une base de données. Le script lui-même pourra être déployé sur un service tel qu'Azure Function, qui s'occupera de l'exécuter à intervalles réguliers.
+    Une façon de se protéger du data drift est de régulièrement évaluer les prédictions de notre modèle. Si la RMSE de ces prédictions passe au-dessus d'un certain seuil, il devient alors nécessaire de réentraîner notre modèle avec des données récentes. Dans ce projet, nous réalisons ce suivi grâce au script \href{https://github.com/vinpap/predict_climate_change/blob/main/monitoring.py}{monitoring.py}, qui est destiné à être exécuté régulièrement pour vérifier les performances de notre modèle. Lors de son exécution, ce script réalise les tâches suivantes dans l'ordre :
+    \begin{itemize}
+        \item Le script collecte des données de test mises à disposition par les météorologues de notre client. Ces données peuvent provenir soit d'un fichier CSV, soit d'une base de données PostgreSQL. La source est définie au moment de l'exécution en lisant le contenu du fichier de configuration \href{https://github.com/vinpap/predict_climate_change/blob/main/monitoring_cfg.yml}{monitoring\_cfg.yml}
+        \item Ensuite, le script teste le modèle en passant par l'API précédemment présentée et récupère la valeur de la RMSE renvoyée par l'API
+        \item Si cette valeur dépasse \textbf{105\% de la RMSE}, le script réentraîne le modèle via le endpoint /train
+        \item Nous retestons ensuite le modèle nouvellement réentraîné, puis envoyons automatiquement une alerte par e-mail aux administrateurs du projet pour les informer du résultat.
+    \end{itemize}
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{email_alert}
+        \centering
+        \caption{Une alerte envoyée par email lorsque le modèle est réentraîné. L'e-mail est envoyé en utilisant un serveur SMTP spécifié dans le fichier de configuration \href{https://github.com/vinpap/predict_climate_change/blob/main/monitoring_cfg.yml}{monitoring\_cfg.yml}}
+        \centering
+    \end{figure}
+    Quelques précisions supplémentaires concernant ce processus :
+    \begin{itemize}
+        \item Le seuil de 105\% de la RMSE initiale du modèle est stocké dans le fichier de configuration YAML \href{https://github.com/vinpap/predict_climate_change/blob/main/monitoring_cfg.yml}{monitoring\_cfg.yml}. Il est automatiquement calculé et enregistré dans ce fichier lors de la mise en place du monitorage. Ce point sera abordé plus en détail lorsque nous parlerons de la \hyperref[sec:deployment]{documentation qui explique la mise en place de ce projet}.
+        \item Certaines informations sensibles telles que les tokens de sécurité de l'API ou du serveur SMTP ne sont pas stockées dans le fichier de configuration du monitorage et doivent être définies en tant que variables d'environnement lors de la mise en place du monitorage.
+        \item Comme évoqué plus haut, ce script est destiné à être exécuté régulièrement. Bien qu'il soit possible de faire ça manuellement, il est plus fiable d'automatiser l'exécution du script. Pour les besoins de ce dossier, le script est exécuté grâce au fournisseur de cloud \href{https://www.pythonanywhere.com/}{PythonAnywhere}.
+    \end{itemize}
+    \begin{figure}[h]
+        \includegraphics[width=12cm]{python_anywhere}
+        \centering
+        \caption{Tableau de bord de PythonAnywhere. Ici, notre script de monitorage est automatiquement exécuté sur le cloud (cf deuxième tâche de la liste). PythonAnywhere ne nous permet d'exécuter une tâche qu'une fois par jour ou par heure. Nous exécutons donc le script de monitorage une fois par jour, mais enregistrons la date du dernier monitorage dans le fichier de configuration et vérifions qu'au moins un mois s'est écoulé depuis le dernier monitorage au moment de l'exécution}
+        \centering
+    \end{figure}
 
-    [À DE LÀ]
+
+
+    
+
+
 
     La figure 8 récapitule le fonctionnement de notre API et ses interactions avec les autres composants, et notamment le script de monitorage.
     \begin{figure}[h]
@@ -506,6 +525,7 @@
     \section{Documentation}
 
     [Parler de la doc (à rédiger dans le readme). On la résume quand même brièvement en-dessous]
+    \label{sec:deployment}
     \subsection{Déploiement du modèle}
     \subsection{Utilisation du modèle par les météorologues}
     \subsection{Réentraîner le modèle}

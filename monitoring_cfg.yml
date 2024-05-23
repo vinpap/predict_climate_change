@@ -7,6 +7,7 @@ DATA:
   DB_USER: vincent
   LOAD_FROM_CSV: true
 EMAIL_SETTINGS:
-  SMTP_SERVER: smtp.gmail.com
   EMAIL_RECIPIENT: papelardvincent@gmail.com
+  SMTP_SERVER: smtp.gmail.com
+LAST_RUNNING_DATE: 2024-05-23
 RMSE_THRESHOLD: 0.3589540133022646

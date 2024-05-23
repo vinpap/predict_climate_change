@@ -9,6 +9,8 @@ pmdarima = "*"
 numpy = "*"
 matplotlib = "*"
 fastapi = "*"
+psycopg2 = "*"
+requests = "*"
 
 [dev-packages]
 
