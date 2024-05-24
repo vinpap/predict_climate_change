@@ -71,6 +71,7 @@ Il est possible que vous souahitez réentraîner vous-même le modèle d'intelli
 ## Notes concernant la sécurité
 
 Une attention particulière doit être portée au token utilisé pour sécuriser l'API. Ce token doit être envoyé avec chaque requête à l'API et sert à la protéger des accès non autorisés. Voici plusieurs bonnes pratiques à respecter pour que l'API reste sécurisée :
+- Évitez de choisir un token trop court ou trop simple. Il est préférable de générer aléatoirement une longue suite de caractères
 - Communiquez le token de l'API aux utilisateurs via des canaux sécurisés
 - Changez régulièrement le token
 - En plus des règles de sécurité concernant le token, mettez en place une liste d'adresses IP autorisées à accéder à l'API.

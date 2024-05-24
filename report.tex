@@ -524,16 +524,40 @@
 
     \section{Documentation}
 
-    [Parler de la doc (à rédiger dans le readme). On la résume quand même brièvement en-dessous]
+    Une documentation est disponible sur le \href{https://github.com/vinpap/predict_climate_change}{fichier Readme du dépôt GitHub} pour expliquer comment mettre en place et utiliser l'API. Voici un bref résumé de cette documentation (pour une liste détaillée des commandes et actions à exécuter à chaque étape, il est recommandé de lire le fichier README accessible via le lien ci-dessus).
     \label{sec:deployment}
-    \subsection{Déploiement du modèle}
+    \subsection{Mise en place l'API et du monitorage}
+
+    Cette section s'adresse aux administrateurs informatiques de notre client. Elle explique la marche à suivre pour déployer le modèle sur les serveurs choisis par notre client, lancer l'API et mettre le monitorage en place. Voici comment déployer l'API :
+    \begin{enumerate}
+        \item cloner le dépôt GitHub
+        \item installer les dépendances du projet
+        \item définir un token de sécurité pour l'API dans les variables d'environnement
+        \item lancer l'API
+    \end{enumerate}
+
+    L'API est maintenant disponible. Cependant, aucun modèle n'a été entraîné. Le premier entraînement du modèle est réalisé par le script de monitorage dont la mise en place est expliquée ci-dessous :
+    \begin{enumerate}
+        \item spécifier l'adresse de l'API dans le fichier de configuration monitoring\_cfg.yml
+        \item toujours dans le fichier de configuration, spécifier la source des données utilisées pour le monitorage (fichier CSV ou base de données PostgreSQL, avec les informations nécessaires)
+        \item dans la section EMAIL\_SETTINGS du fichier de configuration, spécifier les informations du serveru SMTP à utiliser pour envoyer automatiquement les alertes par e-mail
+        \item créer les variables d'environnement qui contiennent les valeurs qui doivent rester secrètes (token pour accéder à l'API, identifiant et mot de passe du serveur SMTP, mot de passe de la base de données si on en utilise une)
+        \item exécuter le script de monitorage monitoring.py \textbf{avec l'option --setup}. Cette option indique au script qu'il doit entraîner le modèle de l'API via le point de terminaison /train et calculer le seuil d'erreur à utiliser à l'avenir. Ce seuil est ensuite stocké dans le fichier de configuration
+    \end{enumerate}
+
+    Cette section de la documentation explique également comment faire si notre client souhaite changer le modèle utilisé, par exemple si il souhaite prédire des températures mensuelles moyennes pour une ville spécifique. Pour cela la méthode la plus propre consiste à exécuter une nouvelle fois le script monitoring.py avec l'option --setup après avoir modifié la source de données. Dans le cas où notre client voudrait plusieurs modèles de prédiction qui répondent à différents besoins, il peut également déployer plusieurs versions de l'API qui utilisent différentes données.
+
+    Enfin, la documentation donne quelques conseils de sécurité aux administrateurs, notamment concernant la façon dont le token de sécurité est généré et communiqué aux utilisateurs.
+
     \subsection{Utilisation du modèle par les météorologues}
-    \subsection{Réentraîner le modèle}
-    \subsection{Gestion de la sécurité}
 
+    La documentation contient également une section qui explique comment les météorologues de l'organisation de notre client peuvent utiliser l'API. Ils devront donc :
+    \begin{itemize}
+        \item obtenir le token de l'API auprès des administrateurs qui gèrent l'API au sein de l'organisation
+        \item envoyer une requête POST au point de terminaison /predict de l'API, en y joignant la date pour laquelle ils veulent avoir une prédiction (dans le champ "date") et le token de sécurité (dans le champ "secret\_token")
+        \item l'API leur renverra la liste des températures mensuelles prédites de la dernière date couverte par les données d'entraînement du modèle jusqu'à la date demandée.
+    \end{itemize}
 
-
-    \newpage
     \section*{Conclusion}
     Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi SARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
     Sur une note plus personnelle, le travail réalisé pour ce projet m'a permis de mieux comprendre le fonctionnement des modèles de séries temporelles ainsi que les caractéristiques propres à ce type de données.
