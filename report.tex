@@ -111,7 +111,7 @@
     \section*{Introduction}
 
     Un grand organisme de prédiction météorologique nous contacte. 
-    Afin de prédire au mieux l'évolution du climat à échelle mondiale et dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne en cherchant la meilleure précision possible. Plus spécifiquement, ils nous demandent un modèle capable de prédire l'évolution d'une série de températures sur de longues périodes. 
+    Afin de prédire au mieux l'évolution du climat à échelle mondiale et dans le but de sensibiliser la population au réchaffement climatique, ses dirigeants souhaitent remplacer leurs modèles de prédiction vieillissants par un modèle d'IA moderne en cherchant la meilleure précision possible. Plus spécifiquement, ils nous demandent un modèle capable de prédire \textbf{l'évolution d'une série de températures mensuelles moyennes} sur de longues périodes. 
     
     Le code associé à ce dossier est disponible \href{https://github.com/vinpap/predict_climate_change}{sur GitHub}.
 
@@ -124,7 +124,7 @@
     Par ailleurs, notre client nous impose les contraintes suivantes :
     \begin{itemize}
         \item le modèle doit être utilisable via une API. Les techniciens de notre client doivent pouvoir utiliser cette API pour réaliser des prédictions, évaluer les performances du modèle et le réentraîner
-        \item notre client dispose de serveurs adaptés à la mise en place de modèles d'intelligence artificielle exigeants en ressource. Par conséquent, le choix du modèle d'intelligence artificielle à utiliser ne devrait pas exclure les modèles nécessitant beaucoup de puissance de calcul. En revanche, notre client insiste sur le fait que le modèle retenu doit être \textbf{celui qui offre les prédictions les plus précises} afin d'éviter les erreurs de prévision et pour que le public continue à faire confiance aux organismes météorologiques.
+        \item notre client dispose de serveurs adaptés à la mise en place de modèles d'intelligence artificielle exigeants en ressource. Par conséquent, le choix du modèle d'intelligence artificielle à utiliser ne devrait pas exclure les modèles nécessitant beaucoup de puissance de calcul. En revanche, notre client insiste sur le fait que le modèle retenu doit être \textbf{celui qui offre les prédictions les plus précises} afin d'éviter les erreurs de prévision et ainsi préserver la confiance du public.
         \item des instructions expliquant comment installer et utiliser le modèle sur les serveurs de notre client devront être fournies.
     \end{itemize}
 
@@ -139,7 +139,7 @@
         \item les données fournies sont des moyennes mensuelles de température. Cette granularité nous permet de capturer des informations sur l'évolution des températures au fil des saisons, ce que ne permettraient pas des moyennes annuelles par exemple.
     \end{itemize}
     
-    Nous nous intéresserons  plus spécifiquement à la \textbf{température mensuelle moyenne sur Terre} de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv (cf figure 1).
+    Nous nous intéresserons  plus spécifiquement à la \textbf{température mensuelle moyenne sur Terre} de 1860 à nos jours. Cette information est stockée dans la table GlobalTemperatures.csv.
     
 
 
@@ -453,23 +453,23 @@
 
     Il est temps de déployer le modèle sur une API afin de le mettre à disposition des météorologues. Pour cela, nous utiliserons le module Python \href{https://fastapi.tiangolo.com/}{FastAPI}, qui nous permet de réaliser rapidement des API performantes. Cette API sera ensuite déployée sur \textbf{Azure Web App} grâce aux fonctions d'intégration continue de GitHub. Ainsi, l'API sera automatiquement redéployée à chaque fois que du nouveau code est poussé sur la branche principale du dépôt GitHub du projet.
 
-    Dans notre cas, nous définirons les endpoints suivants :
+    Dans notre cas, nous définirons les points de terminaison suivants :
     \begin{itemize}
         \item \textbf{predict} : permet de prédire toutes les températures moyennes mensuelles jusqu'à une date donnée par l'utilisateur
         \item \textbf{train} : entraîne le modèle SARIMA. Pour cela, l'utilisateur envoie à l'API une liste de températures mensuelles ainsi que la date qui marque le début de la série de températures
         \item \textbf{test} : prédit les températures mensuelles moyennes envoyées par l'utilisateur, puis compare ces prédictions aux températures relevées aux mêmes dates et calcule la RMSE. L'utilisateur doit joindre à cette requête la liste de températures à utiliser pour réaliser le test et la date qui marque le début de cette série.
     \end{itemize}
 
-    Un point crucial est qu'il est nécessaire de \textbf{sécuriser notre API}. En l'état, celle-ci souffre d'un défaut majeur : n'importe qui peut effectuer des requêtes à notre API. Imaginons que quelqu'un sans aucun rapport avec l'organisation de météorologie que nous servons réentraîne le modèle avec ses données, ou sature les capacités de la machine qui héberge notre API en réalisant de nombreuses requêtes simultanément : ce serait un désastre !
+    Un point crucial est qu'il est nécessaire de \textbf{sécuriser notre API}. En l'état, n'importe qui peut effectuer des requêtes à notre API. Nous pourrions donc tout à fait imaginer un scnénario où quelqu'un sans aucun rapport avec l'organisation de météorologie que nous servons réentraîne le modèle avec ses données, ou sature les capacités de la machine qui héberge notre API en réalisant de nombreuses requêtes simultanément.
 
     Pour résoudre ce problème, nous allons implémenter un contrôle d'accès à l'aide d'un \textbf{token de sécurité}. Ce token devra être envoyé avec chaque requête à notre API. Seules les requêtes qui présentent un token valide seront traitées. On veillera par ailleurs à ne pas stocker de token en clair dans le code de notre API. Ce token sera enregistré en tant que variable d'environnement sur l'hôte qui exécute le code de notre API sur Azure. Sa valeur est stockée dans un secret GitHub qui est automatiquement transmis à Azure au moment du déploiement.
 
-    Une fois le déploiement effectué, l'API est disponible à l'adresse fournie par Azure (https://vincent-predict-climate-change.azurewebsites.net/ dans notre cas). La figure ci-dessous montre à quoi ressemble l'API une fois déployée sur Azure.
+    Une fois le déploiement effectué, l'API est disponible à l'adresse fournie par Azure (\href{https://vincent-predict-climate-change.azurewebsites.net/}{https://vincent-predict-climate-change.azurewebsites.net/} dans notre cas). La figure ci-dessous montre à quoi ressemble l'API une fois déployée sur Azure.
 
     \begin{figure}[h]
         \includegraphics[width=12cm]{api_azure}
         \centering
-        \caption{FastAPI définit automatiquement un endpoint /docs qui nous permet d'envoyer des requêtes à notre API directement depuis le navigateur. Cette figure montre un exemple de requête POST envoyée au endpoint /train}
+        \caption{FastAPI définit automatiquement un point de terminaison /docs qui nous permet d'envoyer des requêtes à notre API directement depuis le navigateur. Cette figure montre un exemple de requête POST envoyée au point de terminaison /train}
         \centering
     \end{figure}
 
@@ -486,7 +486,7 @@
     \begin{itemize}
         \item Le script collecte des données de test mises à disposition par les météorologues de notre client. Ces données peuvent provenir soit d'un fichier CSV, soit d'une base de données PostgreSQL. La source est définie au moment de l'exécution en lisant le contenu du fichier de configuration \href{https://github.com/vinpap/predict_climate_change/blob/main/monitoring_cfg.yml}{monitoring\_cfg.yml}
         \item Ensuite, le script teste le modèle en passant par l'API précédemment présentée et récupère la valeur de la RMSE renvoyée par l'API
-        \item Si cette valeur dépasse \textbf{105\% de la RMSE}, le script réentraîne le modèle via le endpoint /train
+        \item Si cette valeur dépasse \textbf{105\% de la RMSE}, le script réentraîne le modèle via le point de terminaison /train
         \item Nous retestons ensuite le modèle nouvellement réentraîné, puis envoyons automatiquement une alerte par e-mail aux administrateurs du projet pour les informer du résultat.
     \end{itemize}
     \begin{figure}[h]
@@ -552,11 +552,11 @@
     \subsection{Utilisation du modèle par les météorologues}
 
     La documentation contient également une section qui explique comment les météorologues de l'organisation de notre client peuvent utiliser l'API. Ils devront donc :
-    \begin{itemize}
+    \begin{enumerate}
         \item obtenir le token de l'API auprès des administrateurs qui gèrent l'API au sein de l'organisation
         \item envoyer une requête POST au point de terminaison /predict de l'API, en y joignant la date pour laquelle ils veulent avoir une prédiction (dans le champ "date") et le token de sécurité (dans le champ "secret\_token")
         \item l'API leur renverra la liste des températures mensuelles prédites de la dernière date couverte par les données d'entraînement du modèle jusqu'à la date demandée.
-    \end{itemize}
+    \end{enumerate}
 
     \section*{Conclusion}
     Ce rapport nous a offert une présentation de trois des modèles de prédiction de séries temporelles les plus utilisés : \textbf{ARIMA}, \textbf{Facebook Prophet} et les \textbf{LSTM}. Nous avons ensuite vu pourquoi SARIMA était le modèle le plus adapté à nos besoins. Enfin, nous avons présenté comment déployer notre modèle sur une API REST pour le mettre à disposition des météorologues qui souhaitent réaliser des prédictions concernant les évolutions futures du climat.
